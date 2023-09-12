@@ -1,0 +1,17 @@
+#parent {
+   position: relative;
+}
+img.superpose {
+   position: absolute;
+   top: 25px;
+   left: 30px;
+}
+#img_1 {
+   z-index: 10;
+}
+#img_2 {
+   z-index: 11;
+}
+#img_3 {
+   z-index: 12;
+}
