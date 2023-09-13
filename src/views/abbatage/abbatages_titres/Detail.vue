@@ -87,6 +87,10 @@
               :items="items" 
               :fields="fields" 
               :tbody-tr-class="rowClass" >
+              <template v-slot:head(volume)="data">
+                <span class="d-flex justify-content-center align-items-center" v-html="data.field.label"></span>
+                <span>(m<sup>3</sup>)</span>
+              </template>
                 <template #table-busy>
                   <div class="text-center text-success my-2">
                     <b-spinner class="align-middle"></b-spinner>
@@ -140,8 +144,8 @@ export default {
 fields: [ 
 	{ key: 'index', label: '' },{ key: 'numordre', label: 'N° d\'ordre',thStyle: { width: "10%"} }, { key: 'codebaretige', label: 'Code barre tige' },
     { key: 'codebarreabbattage', label: 'Code Barre abbattage' }, { key: 'numsequentiel', label: 'N° Sequentiel' },{key : 'essence', label :'essence',thStyle: { width: "8%"}}, 
-    { key: 'diametrepetitbout', label : 'Diamètre petit bout' }, { key: 'diametregrosbout', label: 'Diametre gros but' }, { key: 'longueur', label: 'longueur' },
-	{ key: 'volume', label : 'volume(en m)' }, { key: 'rejet', label: 'rejet' }, { key: 'motifrejet', label: 'Motif de rejet' }],
+    { key: 'diametrepetitbout', label : 'Diamètre petit bout (cm)' }, { key: 'diametregrosbout', label: 'Diametre gros but (cm)' }, { key: 'longueur', label: 'longueur (m)' },
+	{ key: 'volume', label : 'volume' }, { key: 'rejet', label: 'rejet' }, { key: 'motifrejet', label: 'Motif de rejet' }],
 	
 	
 	elements:[

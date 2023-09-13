@@ -187,6 +187,7 @@
                 </template>
                 <template v-slot:head(volume)="data">
                   <span v-html="data.field.label" style="color:green"></span>
+                  <span style="color:green">(m<sup>3</sup>)</span>
                 </template>
                 <template #table-busy>
                   <div class="text-center text-success my-2">
@@ -309,7 +310,7 @@
             <template v-slot:head(utmx)="data"><span v-html="data.field.label" style="color:green" class="d-flex justify-content-center"></span></template>
             <template v-slot:head(utmy)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template v-slot:head(qualite)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span></template>
+            <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span><span style="color:green">(m<sup>3</sup>)</span></template>
             <template #table-busy>
               <div class="text-center text-success my-2">
                 <b-spinner class="align-middle"></b-spinner>
@@ -389,7 +390,7 @@
             <template v-slot:head(longueur)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template v-slot:head(diametrePb)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template v-slot:head(diametreGb)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span></template>
+            <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span><span style="color:green">(m<sup>3</sup>)</span></template>
             <template #table-busy>
               <div class="text-center text-success my-2">
                 <b-spinner class="align-middle"></b-spinner>
@@ -453,7 +454,7 @@
              <template v-slot:head(longueur)="data"><span v-html="data.field.label" style="color:green"></span></template>
              <template v-slot:head(largeur)="data"><span v-html="data.field.label" style="color:green"></span></template>
              <template v-slot:head(epaisseur)="data"><span v-html="data.field.label" style="color:green"></span></template>
-             <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span></template>
+             <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span><span style="color:green">(m<sup>3</sup>)</span></template>
              <template #table-busy>
                <div class="text-center text-success my-2">
                  <b-spinner class="align-middle"></b-spinner>
@@ -517,7 +518,7 @@
               <template v-slot:head(utmy)="data"><span v-html="data.field.label" style="color:green"></span></template>
               <template v-slot:head(qualite)="data"><span v-html="data.field.label" style="color:green"></span></template>
           
-              <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span></template>
+              <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span><span style="color:green">(m<sup>3</sup>)</span></template>
               <template #table-busy>
                 <div class="text-center text-success my-2">
                   <b-spinner class="align-middle"></b-spinner>
@@ -670,7 +671,7 @@ export default {
       { key: 'codebarre', label: 'Code barre' },
       { key: 'sequence', label: 'Séquence' },
       { key: 'essence', label: 'Essence', thStyle: { width: "9%" } },
-      { key: 'diametreTige', label: 'Diamètre de la tige' },
+      { key: 'diametreTige', label: 'Diamètre de la tige (cm)' },
       { key: 'utmZone', label: 'UTM Zone', thStyle: { width: "9%" }  },
       { key: 'utmX', label: 'UTM X' }, 
       { key: 'utmY', label: 'UTM Y' },
@@ -701,8 +702,8 @@ export default {
       { key: 'utmY', label: 'UTM Y' },
       { key: 'qualite', label: 'Qualité' }, 
       { key: 'longueur', label: 'Longueur(m)' },
-      { key: 'diametrePb', label: 'diamètre Pb' },
-      { key: 'diametreGb', label: 'diamètre Gb' }, 
+      { key: 'diametrePb', label: 'diamètre Pb (cm)' },
+      { key: 'diametreGb', label: 'diamètre Gb (cm)' }, 
       { key: 'volume', label: 'Volume' },
     ],
     elementsproduitsAEB:[],
@@ -716,8 +717,8 @@ export default {
       { key: 'utmY', label: 'UTM Y' },
       { key: 'qualite', label: 'Qualité' }, 
       { key: 'nombrePieces', label: 'Nb de pièces' }, 
-      { key: 'longueur', label: 'Longueur' },
-      { key: 'largeur', label: 'Largeur' },
+      { key: 'longueur', label: 'Longueur (m)' },
+      { key: 'largeur', label: 'Largeur (m)' },
       { key: 'epaisseur', label: 'Epaisseur' }, 
       { key: 'volume', label: 'Volume' },
     ],
@@ -754,7 +755,7 @@ export default {
       { key: 'codebarre', label: 'Code barre' },
       { key: 'sequence', label: 'Séquence' },
       { key: 'libelleessence', label: 'Essence', thStyle: { width: "9%" } },
-      { key: 'diametreTige', label: 'Diametre de la tige' }, 
+      { key: 'diametreTige', label: 'Diametre de la tige (cm)' }, 
       { key: 'numBloc', label: 'Numéro du bloc'},
       { key: 'numUc', label: 'Numéro de l\'UC' },
       { key: 'numtige', label: 'Numéro de la tige' },
