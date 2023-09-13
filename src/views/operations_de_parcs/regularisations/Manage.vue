@@ -191,10 +191,13 @@
               <template v-slot:head(statutenr)="data">
                 <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
               </template>
+              <template v-slot:head(typeproduit)="data">
+                <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
+              </template>
               <template #empty>
                      <h4 style="color:green" class="text-center">Aucune opération de parc de type <span class="font-weight-bold">régularisation</span> trouvée!!</h4>
               </template>
-               <template #cell(index)="data">
+              <template #cell(index)="data">
                 <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ ++data.index }}</b> </span>
               </template>
               <template #cell(idoperation)="data">
@@ -208,6 +211,11 @@
               </template>
               <template #cell(intitulesite)="data">
                 <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.intituleSite }}</b> </span>
+              </template>
+              <template #cell(typeproduit)="data">
+                <span class="d-flex justify-content-center align-items-center" style="color:green">
+                  <b class="ml-1">{{ data.item.typeproduit }}</b> 
+                </span>
               </template>
               <template #cell(libelletypeopeparc)="data">
                 <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.libelletypeopeparc }}</b> </span>
@@ -277,8 +285,10 @@ export default {
     limitSites: 10,
     //données du tableaux
     fields: [ { key: 'index', label: '' },{ key: 'idoperation', label: 'Entrée No' }, { key: 'dateope', label: 'Date Opération' },
-              { key: 'heureoper', label: 'heure' }, { key: 'intituleSite', label: 'Site' }, 
-              { key: 'libelletypeopeparc', label: 'Type Opération' }, { key: 'statutenr', label: 'statut' }],
+              { key: 'heureoper', label: 'heure' }, { key: 'intituleSite', label: 'Site' },
+              { key: "typeproduit", label: "Type de produit", sortable: true }, 
+              { key: 'libelletypeopeparc', label: 'Type Opération' }, { key: 'statutenr', label: 'statut' },
+              ],
     elements: [],
     selected:{},
     submitted:false,

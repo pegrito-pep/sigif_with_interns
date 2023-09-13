@@ -184,6 +184,9 @@
                 <template #head(statut)="data">
                   <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
                 </template>
+                <template v-slot:head(typeproduit)="data">
+                  <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
+                </template>
                 <template #empty>
                        <h4 style="color:green" class="text-center">Aucune opération de parc de type <span class="font-weight-bold">billonnage</span> trouvée!!</h4>
                 </template>
@@ -202,13 +205,17 @@
                 <template #cell(intitulesite)="data">
                   <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.intitulesite }}</b> </span>
                 </template>
+                <template #cell(typeproduit)="data">
+                  <span class="d-flex justify-content-center align-items-center">
+                    <b class="ml-1">{{ data.item.typeproduit }}</b> 
+                  </span>
+                </template>
                 <template #cell(libelletypeopeparc)="data">
                   <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.libelletypeopeparc }}</b> </span>
                 </template>
                 <template #cell(statut)="data">
                   <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.statut }}</b> </span>
                 </template>
-                
               </b-table>
               <BillonnageDialog ref="listingEntreeParc"></BillonnageDialog>
               <!--AJOUT DE LA PAGINATION -->
@@ -267,8 +274,9 @@ export default {
 
     //données du tableaux
     fields: [ { key: 'index', label: '' },{ key: 'idoperation', label: 'N° d\'entrée', sortable: true }, { key: 'dateoper', label: 'Date Opération', sortable: true },
-              { key: 'heureoper', label: 'heure', sortable: true }, { key: 'intitulesite', label: 'Site opération', sortable: true }, 
+              { key: 'heureoper', label: 'heure', sortable: true }, { key: 'intitulesite', label: 'Site opération', sortable: true },{ key: "typeproduit", label: "Type de produit", sortable: true }, 
               { key: 'libelletypeopeparc', label: 'Type Opération', sortable: true }, { key: 'statut', label: 'statut', sortable: true }],
+              
     elements: [],
     selected:{},
     sites:[],
