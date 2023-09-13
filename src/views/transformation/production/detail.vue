@@ -99,7 +99,7 @@
             <template v-slot:head(sequence)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template v-slot:head(numcolis)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template v-slot:head(essence)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span></template>
+            <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span><span style=" color : green">(m<sup>3</sup>)</span></template>
             <template v-slot:head(superfice)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template v-slot:head(poids)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template #table-busy>
@@ -152,7 +152,7 @@
             <template v-slot:head(largeur)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template v-slot:head(epaisseur)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template v-slot:head(nbpiece)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span></template>
+            <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span><span style="color:green">(m<sup>3</sup>)</span></template>
             <template v-slot:head(superficie)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template v-slot:head(poids)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template #table-busy>
@@ -236,7 +236,7 @@ export default {
       { key: 'sequence', label: 'Séquence n°'},
       {key : 'numcolis', label :'N° du colis'},
       {key : 'essence', label :'Essence'},
-      {key : 'volume', label :'Volume (m3)'},
+      {key : 'volume', label :'Volume'},
       {key : 'superfice', label :'Superficie'},
       {key : 'poids', label :'poids'},
     ],
@@ -248,7 +248,7 @@ export default {
       {key : 'largeur', label :'Largeur(cm)'},
       {key : 'epaisseur', label :'épaisseur(cm)'},
       {key : 'nbpiece', label :'Nb pièces'},
-      {key : 'volume', label :'volume(m3)'},
+      {key : 'volume', label :'volume'},
       {key : 'superficie', label :'Superficie'},
       {key : 'poids', label :'poids'}
     ],
