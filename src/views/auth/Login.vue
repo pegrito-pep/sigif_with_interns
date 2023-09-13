@@ -352,8 +352,6 @@ export default {
     },
     
     sendForm() {
-      storage.set('access_token','eyJhbGciOiJIUzM4NCJ9.eyJsb2dpbiI6IkFXT05PIiwidHlwZSI6ImFjY2VzcyIsImlhdCI6MTY4NjU2NzAyNywiaXNzIjoic2lnaWYiLCJleHAiOjE2ODc0MzEwMjcsIm9yZ2FuaXNhdGlvbiI6MCwidHlwZW9yZ2FuaXNhdGlvbiI6Ik1GIn0.5nx4IZRlyqdDoamFvG5srawNPtyUj2J4JfR9LJCyd4DdnnBkJKcw5C_63GQ-mw5-')
-      this.$router.push({ name: "modules" });
       
       this.submitted = true
       storage.set('login',this.login)
@@ -469,6 +467,7 @@ export default {
     },
   },
   mounted(){
+    this.unreachableapi();
    this.alertDisconnect()
 
   }

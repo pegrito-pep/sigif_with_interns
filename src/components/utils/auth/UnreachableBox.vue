@@ -1,15 +1,17 @@
 <template>
-    <data-modal ref="popup">
+    <data-modal ref="popup" class="pops" largeur="500">
         <div class="header">
-            <h2 class="mt-0 font-weight-bold" style="font-size: 16px">{{ title }}</h2>
+            <h2 class="err" style="font-size: 16px">{{ title }}</h2>
             <button type="button"  @click="_close" class="close" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
+                <span aria-hidden="true" >&times;</span>
             </button>
         </div>
-        <div class="jconfirm-title-c d-flex justify-content-center align-items-center"><span class="jconfirm-icon-c">
-            <i class="fa fa-times format-icon"></i></span>
+        <div class="jconfirm-title-c" id="mess"><span class="jconfirm-icon-c">
+            <i class="fa fa-times format-icon"></i>
+        </span>
+        <p>Malheureusement une erreur est survenu</p>
         </div>
-        <div class="jconfirm-content-pane no-scroll" style="transition-duration: 0.4s; transition-timing-function: cubic-bezier(0.36, 0.55, 0.19, 1); max-height: 215.031px;">
+        <div class="jconfirm-content-pane no-scroll" id="err" style="transition-duration: 0.4s; transition-timing-function: cubic-bezier(0.36, 0.55, 0.19, 1); max-height: 255.031px;">
             <div class="jconfirm-content format-message"><div>impossible de joindre le serveur</div></div>
         </div>
     </data-modal>
@@ -69,8 +71,10 @@ export default {
 
 .format-message{
     text-align: center;
-    font-size: 20px;
-    color: #201e1e; 
+    font-size: 18px;
+    color: #ff0000; 
+    font-weight: 900;
+    margin: 20px 0px 40px 0px;
 }
 .format-title{
     color: rgba(0, 0, 0, 0.87);
@@ -79,26 +83,61 @@ export default {
     text-align: center;
     margin-bottom: 10px; 
 }
+
+#mess{
+    height: 40px;
+    margin-top: 10px;
+    
+}
+#mess p{
+    margin: 8px 0 0 0px;
+    padding: 0 0 35px 0;
+}
 .format-icon{
-    font-size: 69px;
-	color: #e74c3c !important;
+    font-size: 20px;
+	color: white!important;
+    background-color: #f54343;
+    border-radius: 100%;
+    height: 40px;
+    width: 40px;
 	font-weight: 900;
-	vertical-align: middle; 
+    padding: 10px;
+    position: relative;
+    margin-top: 20px;
+}
+
+.pops{
+    padding: 40px 350px 0px 350px;
+}
+.err{
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+#err{
+    height: 10%;
+    position: relative;
+    bottom: -30px;
+    margin-bottom: 60px;
+    margin: auto;
+    width: 70%;
 }
 .header{
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
     background-image: url('~@/assets/images/image.png');
-    height: 20px!important;
+    height: 42px!important;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    padding: 2px 2px;
+    padding: 0 10px 0 10px;
 }
 
 .close {
-    margin-top: -2px;
-    font-size: 22px;
+    margin-top: px;
+    font-size: 48px;
+    opacity: 1;
 }
 
 

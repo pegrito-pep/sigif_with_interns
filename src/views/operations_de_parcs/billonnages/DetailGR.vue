@@ -71,6 +71,11 @@
                 <template v-slot:head(diametrepb)="data"><span v-html="data.field.label" style="color:green"></span></template>
                 <template v-slot:head(diametregb)="data"><span v-html="data.field.label" style="color:green"></span></template>
                 <template v-slot:head(longueur)="data"><span v-html="data.field.label" style="color:green"></span></template>
+                <template v-slot:head(volume)="data">
+                    <span class="d-flex justify-content-center align-items-center">
+                      <span v-html="data.field.label" style="color:green"></span><span style="color:green">(m<sup>3</sup>)</span>
+                    </span>
+                  </template>  
                   <template #table-busy>
                     <div class="text-center text-success my-2">
                       <b-spinner class="align-middle"></b-spinner>
@@ -98,6 +103,9 @@
                     </template> 
                     <template #cell(longueur)="data">
                       <input type="text" disabled v-model="data.item.longueur" class="form-control-xs m-1 w-75" style="background:#82C138; border: 1px solid white;text-align: right;color: inherit">
+                    </template>
+                    <template #cell(volume)="data">
+                      <input type="text" disabled v-model="data.item.volume" class="form-control-xs m-1 w-75" style="background:#82C138; border: 1px solid white;text-align: right;color: inherit">
                     </template> 
                 </b-table>
           </div>
@@ -213,15 +221,16 @@ export default {
         { key: "index", label: "", thStyle: { width: "2%" } },
         { key: "codebarre", label: "codes à barres" },{ key: "reference", label: "Référence" },
         { key: "lignedf10", label: "Ligne DF 10" }, { key: "essence", label: "Essence", thStyle: { width: "30%" } }, { key: "diametrepb", label: "Diamètre petit bout" },
-        { key: "diametregb", label: "Diamètre gros bout" }, { key: "longueur", label: "Longueur(m)" }
+        { key: "diametregb", label: "Diamètre gros bout" }, { key: "longueur", label: "Longueur(m)" },
+        { key: "volume", label: "Volume" }
     ],
     itemsGrumes:[],
     fieldsBillons: [
         { key: "index", label: "", thStyle: { width: "2%" } },
         { key: "codebarre", label: "code barre", thStyle: { width: "16%" }},{ key: "sequence", label: "Séquence" },
-        { key: "essence", label: "Essence", thStyle: { width: "15%" } }, { key: "numbillon", label: "N° Billon" }, { key: "diametrepb", label: "Diamètre Petit bout", thStyle: { width: "10%" } },
+        { key: "essence", label: "Essence", thStyle: { width: "15%" } }, { key: "numbillon", label: "N° Billon", thStyle: { width: "9%" } }, { key: "diametrepb", label: "Diamètre Petit bout", thStyle: { width: "10%" } },
         { key: "diametregb", label: "Diamètre Gros bout", thStyle: { width: "12%" } }, 
-        { key: "longueur", label: "Longueur(m)", thStyle: { width: "9%" } }, { key: "volume", label: "Volume (m3)", thStyle: { width: "9%" }  }, { key: "abandonner", label: "Abandonné ?", thStyle: { width: "9%" }  },
+        { key: "longueur", label: "Longueur(m)", thStyle: { width: "9%" } }, { key: "volume", label: "Volume (m3)", thStyle: { width: "9%" }  }, { key: "abandonner", label: "Abandonné ?"  },
         { key: "position", label: "Position" },
     ],
     itemsBillons:[],
@@ -333,6 +342,7 @@ export default {
     this.billonnage.volBillons =  this.billonnage.volBillons !=null ? this.billonnage.volBillons.toFixed(3) :''
     this.itemsGrumes=this.billonnage.grummes
     this.itemsBillons=this.billonnage.billons
+    console.log('grumes ',this.itemsGrumes,' itembillons ',this.itemsBillons);
     this.itemsBillons.map(elt => {
       elt.volume =elt.volume !=null ? elt.volume.toFixed(3) :''
     })

@@ -77,7 +77,7 @@
           <!--entete des tableaux -->
           <div class="m-0 px-2 table-header-border">
             <b-row>
-              <b-col><h4 class="tab-header-left-text"><b-img src="@/assets/images/picto_user_vert.png"></b-img> Arrêté FOB</h4></b-col>
+              <b-col><h4 class="tab-header-left-text"> Arrêté FOB</h4></b-col>
               <b-col class="col-md-auto">
                 <b-button :disabled="!canCreateValeurFob"  @click.prevent="addValeurFob"  size="sm" :class="{'change-image-opacity': !canCreateValeurFob,  'not-change-image-opacity': canCreateValeurFob}" class="mx-1 simple-btn"><b-img  src="@/assets/images/iconPLUS_16x16.png"></b-img> Créer</b-button>
                 <span >
@@ -96,26 +96,25 @@
                 :items="items" 
                 :fields="fields" 
                 :tbody-tr-class="rowClass" show-empty>
-                <template #table-busy>
-                  <div class="text-center text-success my-2">
-                    <b-spinner class="align-middle"></b-spinner>
-                    <strong class="ml-1">chargement...</strong>
-                  </div>
-                </template>
-                <template #empty>
-                  <h4 style="color: green" class="text-center">
-                    Aucune
-                    <span class="font-weight-bold">donnée</span> trouvée!!
-                  </h4>
-                </template>
-                 <template #cell(index)="data"><b class="ml-1" style="color: #175131!important">{{ ++data.index }}</b> </template>
-                 <template #cell(actif)>
-                     <span  style="color: green; font-weight:bold"><i class="fa fa-check fa-lg" aria-hidden="true"></i></span>
-                </template>
-                <template #cell(estcemac)="data">
-                     <span v-if="data.estcemac==1"  style="color: green; font-weight:bold"><i class="fa fa-check fa-lg" aria-hidden="true"></i></span>
-                     <span v-else></span>
-                </template>
+                  <template #table-busy>
+                    <div class="text-center text-success my-2">
+                      <b-spinner class="align-middle"></b-spinner>
+                      <strong class="ml-1">chargement...</strong>
+                    </div>
+                  </template>
+                  <template v-slot:head(arreteFob)="data">
+                      <span v-html="data.field.label" class="d-flex justify-content-center align-items-center"></span>
+                    </template>
+                  <template #empty>
+                    <h4 style="color: green" class="text-center">
+                      Aucune
+                      <span class="font-weight-bold">donnée</span> trouvée!!
+                    </h4>
+                  </template>
+                  <template #cell(arreteFob)="data">
+                        <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.arreteFob }}</b> </span>
+                  </template>
+                
               </b-table>
 
               <!--AJOUT DE LA PAGINATION -->
@@ -183,7 +182,7 @@ export default {
     //données du tableaux
     fields: [
         { key: 'index', label: '' },
-        { key: 'refArrete', label: 'Arrêté no' },
+        { key: 'arreteFob', label: 'Arrêté no' },
         { key: 'dateSignature', label: 'Date signature' },
         { key: 'dateEffet', label: 'Date effet' },
     ],
@@ -228,18 +227,14 @@ export default {
       return 
     }
   },
-  handleAddUser(){
-    this.getUsers();
-    this.$bvModal.hide('user-form')
-  },
+
   onRowSelected(items) {
     console.log('row selected',items);
     items.isSelected =true;
     this.isRowselected=true
         this.selected = items
   },
-  addUser(){this.$bvModal.show('user-form')},
-  callEditOperationParc(){this.$bvModal.show('modal-lg')},
+
   getRequestParams(page, pageSize){
       let params= {
         page: 0,
@@ -299,7 +294,7 @@ export default {
         this.total = response.data.result.totalItems
         this.currentPage = response.data.result.currentPage + 1
         this.elements=response.data.result.items
-
+        console.log('elements valeurs fob',this.elements);
         this.elements = this.elements.map((elt) => {
           elt.refArrete= elt.arreteFob !==null ? elt.arreteFob.refArrete : "";
             elt.dateSignature =

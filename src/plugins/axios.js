@@ -9,7 +9,7 @@ import axios from "axios";
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 const env = process.env.NODE_ENV || 'development'
-// let baseURL = 'http://192.168.100.181:8280';
+// let baseURL = 'http://192.168.100.109:8080';
 let baseURL = 'http://192.168.100.109:8080'
 let url = "http://192.168.100.109:8080"
 if (env === 'production') {

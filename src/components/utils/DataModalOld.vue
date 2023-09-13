@@ -44,9 +44,8 @@ export default {
 
 #cover {
     background-image: url('~@/assets/images/logo_sigif_trame.png');
-    background-size: 13vw 20vh;
-    background-position: bottom;
-    background-position: left;
+    background-size: 12vw 20vh;
+    background-position: center;
     background-repeat: no-repeat;
 }
 

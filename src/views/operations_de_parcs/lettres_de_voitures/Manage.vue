@@ -538,8 +538,8 @@ export default {
           console.log(error)
         });
 
-      },
-      filterTable(){
+    },
+    filterTable(){
         if(!this.disabled){
           this.search.entite = this.entite.libelle
         }
@@ -583,99 +583,99 @@ export default {
         .catch((error) => {
           this.isBusy=false
         });
-      },
-      resetSearcheBar(){
-        this.search = {
-          datedeb: "",
-          datefin: "",
-          entite: "",
-          statut: "",
-          typeproduit:"",
-          typelv: "",
-          immatriculation: "",
-          sitedepart: "",
-          sitedestination: "",
-          codebarre: "",
-          transporteur: ""
+    },
+    resetSearcheBar(){
+      this.search = {
+        datedeb: "",
+        datefin: "",
+        entite: "",
+        statut: "",
+        typeproduit:"",
+        typelv: "",
+        immatriculation: "",
+        sitedepart: "",
+        sitedestination: "",
+        codebarre: "",
+        transporteur: ""
+      }
+      localStorage.removeItem('sigif2./lettres-voiture')
+    },
+    reset(){
+      this.resetSearcheBar()
+      this.getLettresVoitures()
+    },
+    toggleSideBar(){
+      var sidebar = document.querySelector('#sidebar');
+      var administration = document.querySelector('#administration');
+      var administrationItem = document.querySelectorAll('.administrationItem');
+      var actionButton = document.querySelector("#toggleSideBar");
+      if (sidebar.style.width !== '0px'){
+        sidebar.style.width = '0px';
+        sidebar.style.transition = 'all 0.5s ease';
+        administration.style.backgroundColor = 'white';
+        administration.style.transition = 'background-color 0.2s ease';
+        for (let index = 0; index < administrationItem.length; index++) {
+          const element = administrationItem[index];
+          element.style.opacity = '0';
+          element.style.transition = 'opacity 0.2s ease';
         }
-        localStorage.removeItem('sigif2./lettres-voiture')
-      },
-      reset(){
-        this.resetSearcheBar()
-        this.getLettresVoitures()
-      },
-      toggleSideBar(){
-        var sidebar = document.querySelector('#sidebar');
-        var administration = document.querySelector('#administration');
-        var administrationItem = document.querySelectorAll('.administrationItem');
-        var actionButton = document.querySelector("#toggleSideBar");
-        if (sidebar.style.width !== '0px'){
-          sidebar.style.width = '0px';
-          sidebar.style.transition = 'all 0.5s ease';
-          administration.style.backgroundColor = 'white';
-          administration.style.transition = 'background-color 0.2s ease';
-          for (let index = 0; index < administrationItem.length; index++) {
-            const element = administrationItem[index];
-            element.style.opacity = '0';
-            element.style.transition = 'opacity 0.2s ease';
-          }
-          actionButton.innerHTML = '<i class="fa fa-arrow-right fa-1x" style="font-size: 18px"></i>';
+        actionButton.innerHTML = '<i class="fa fa-arrow-right fa-1x" style="font-size: 18px"></i>';
 
-        }
-        else {
-          sidebar.style.width = '250px';
-          sidebar.style.transition = 'all 0.3s ease';
-          administration.style.backgroundColor = '#82C138';
-          administration.style.transition = 'background-color 0.8s ease';
+      }
+      else {
+        sidebar.style.width = '250px';
+        sidebar.style.transition = 'all 0.3s ease';
+        administration.style.backgroundColor = '#82C138';
+        administration.style.transition = 'background-color 0.8s ease';
 
-          for (let index = 0; index < administrationItem.length; index++) {
-            const element = administrationItem[index];
-            element.style.opacity = '100%';
-            element.style.transition = 'opacity 1s ease';
+        for (let index = 0; index < administrationItem.length; index++) {
+          const element = administrationItem[index];
+          element.style.opacity = '100%';
+          element.style.transition = 'opacity 1s ease';
+        }
+        
+        actionButton.innerHTML = '<i class="fa fa-arrow-left" style="font-size: 18px"></i>';
+      }
+    },
+    async getSites(){
+      this.showOverlaySite=true
+      if(!php.empty(this.$store.state.sitesnoutbs)){
+        this.sites=this.$store.state.sitesnoutbs
+      }
+      else{
+        try {
+            this.sites = await this.$donneesReference.get("sites/no-utb").then(response => response.data.result);
+            this.$store.dispatch('sitesnoutbs', this.sites)
+        } catch (error) {
+            console.log(error.message)
+        }
+      }
+    this.showOverlaySite=false
+    },
+    //notification de lettre de voiture ajoutée avec succès
+    showAlert() {
+        const Toast = this.$swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 4000,
+          width: '25em',
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
           }
-          
-          actionButton.innerHTML = '<i class="fa fa-arrow-left" style="font-size: 18px"></i>';
-        }
-      },
-      async getSites(){
-        this.showOverlaySite=true
-        if(!php.empty(this.$store.state.sitesnoutbs)){
-          this.sites=this.$store.state.sitesnoutbs
-        }
-        else{
-          try {
-              this.sites = await this.$donneesReference.get("sites/no-utb").then(response => response.data.result);
-              this.$store.dispatch('sitesnoutbs', this.sites)
-          } catch (error) {
-              console.log(error.message)
-          }
-        }
-      this.showOverlaySite=false
-      },
-      //notification de lettre de voiture ajoutée avec succès
-      showAlert() {
-          const Toast = this.$swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 4000,
-            width: '25em',
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.addEventListener('mouseenter', Swal.stopTimer)
-              toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-          })
+        })
 
-          Toast.fire({
-            icon: 'success',
-            title: 'Enregistrement éffectué avec succès'
-          })
-      },
-      onSearch(query) {
-        this.searchdest = query
-        this.offsetdest = 0
-      },
+        Toast.fire({
+          icon: 'success',
+          title: 'Enregistrement éffectué avec succès'
+        })
+    },
+    onSearch(query) {
+      this.searchdest = query
+      this.offsetdest = 0
+    },
   
  },
   mounted(){

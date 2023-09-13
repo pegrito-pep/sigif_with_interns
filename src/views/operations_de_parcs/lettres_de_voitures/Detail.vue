@@ -194,7 +194,7 @@
               <b-col class="col-md-auto">
                 <b-row class="d-flex justify-content-center align-items-center">
                   <b-col cols="5"><label for="" class="h-100 d-flex justify-content-end align-items-end">Code Barre</label></b-col>
-                  <b-col cols="7"><b-form-input class="mt-1 px-2 form-control-xs"></b-form-input></b-col>
+                  <b-col cols="7"><b-form-input v-model="search" class="mt-1 px-2 form-control-xs"></b-form-input></b-col>
                 </b-row>
                 <!--<div class="d-flex">
                   <label for="">Code Barre</label>
@@ -396,6 +396,7 @@ export default {
     typesLv:[],
     typesB:[],
     lettre:{},
+    search: null,
     isBusyDetailsDebites:false,
     fieldsDetailsDebites:[
         { key: "index", label: "", thStyle: { width: "2%" } },
@@ -426,8 +427,9 @@ export default {
         { key: "nomcommercial", label: "Nom Commercial", thStyle: { width: "25%" }}, 
     ],
     itemsLvd:[],
-
+    trueItemsLvd:[],
     elements:[],
+    trueElements:[],
     perPage: 10,
     currentPage: 1,
     total: 0
@@ -477,6 +479,23 @@ export default {
       if(!php.empty(value)){
       setTimeout(() => {this.$refs['tableGrumes'].selectRow(0) }, 200);
       }
+    },
+    search(value) {
+        if(this.lettreV.typeopeparc=='LVG'){
+            this.elements = !php.empty(value)
+            ? this.elements.filter(elt =>
+                elt.codebarre.toLowerCase().includes(value.toLowerCase()) 
+                )
+            : this.trueElements;
+        }else if(this.lettreV.typeopeparc=='LVD'){
+            this.itemsLvd = !php.empty(value)
+            ? this.itemsLvd.filter(elt =>
+                elt.codebarre.toLowerCase().includes(value.toLowerCase()) 
+                )
+            : this.trueItemsLvd;
+        }
+      
+    
     }
  },
  methods: {
@@ -567,7 +586,7 @@ export default {
         }
         if(this.lettreV.typeopeparc=='LVG'){
           if(this.lettreV.listeElements.details.length>0){
-          this.elements=this.lettreV.listeElements.details
+          this.elements=this.trueElements=this.lettreV.listeElements.details
         } 
         } 
         if(this.lettreV.typeopeparc=='LVD'){

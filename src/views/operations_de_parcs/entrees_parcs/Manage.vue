@@ -144,8 +144,10 @@
               <b-button :disabled="!canUpdateOperationParc" size="sm" :class="{'change-image-opacity': !canUpdateOperationParc,  'not-change-image-opacity': canUpdateOperationParc}"  class="mx-1 simple-btn"><b-img src="@/assets/images/iconMODIFIER_16x16.png"></b-img>modifier</b-button>
               <b-button :disabled="!canDeleteOperationParc" size="sm" :class="{'change-image-opacity': !canDeleteOperationParc,  'not-change-image-opacity': canDeleteOperationParc}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconSUPPRIMER_16x16.png"></b-img>supprimer</b-button>
               <b-button  :disabled="!canViewDetailsOperationParc" @click.prevent="showDetails" size="sm" :class="{'change-image-opacity': !canViewDetailsOperationParc,  'not-change-image-opacity': canViewDetailsOperationParc}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconVISUALISER_16x16.png"></b-img>consulter</b-button>
-              <b-button style="cursor: pointer" @click.prevent="validateEntreeParc" :disabled="!isToValidate||!isMinfof" size="sm" :class="{'change-image-opacity': !isToValidate,  'not-change-image-opacity': isToValidate}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconVALIDER_16x16.png"></b-img>valider</b-button>
-              <b-button style="cursor: pointer" @click.prevent="submitEntreeParc" :disabled="!isToSubmit" size="sm" :class="{'change-image-opacity': !isToSubmit,  'not-change-image-opacity': isToSubmit}" class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !isToSubmit}" src="@/assets/images/iconSUBMIT_16x16.png"></b-img>soumettre</b-button>
+              <span v-if="!isMinfof">
+                <b-button style="cursor: pointer" @click.prevent="validateEntreeParc" :disabled="!isToValidate" size="sm" :class="{'change-image-opacity': !isToValidate,  'not-change-image-opacity': isToValidate}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconVALIDER_16x16.png"></b-img>valider</b-button>
+                <b-button style="cursor: pointer" @click.prevent="submitEntreeParc" :disabled="!isToSubmit" size="sm" :class="{'change-image-opacity': !isToSubmit,  'not-change-image-opacity': isToSubmit}" class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !isToSubmit}" src="@/assets/images/iconSUBMIT_16x16.png"></b-img>soumettre</b-button>
+              </span>
              
               <!--<b-button @click.prevent="validateEntreeParc" v-if="canSaveOperationParc && isToValidate"  size="sm"
               :class="{'change-image-opacity': !canSaveOperationParc||!isToValidate,
@@ -197,6 +199,9 @@
                   <template v-slot:head(heureoper)="data">
                     <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
                   </template>
+                  <template v-slot:head(typeproduit)="data">
+                    <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
+                  </template>
                   <template v-slot:head(intitulesite)="data">
                     <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
                   </template>
@@ -220,6 +225,11 @@
                   </template>
                   <template #cell(heureoper)="data">
                     <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.heureoper }}</b> </span>
+                  </template>
+                  <template #cell(typeproduit)="data">
+                    <span class="d-flex justify-content-center align-items-center">
+                      <b class="ml-1">{{ data.item.typeproduit }}</b> 
+                    </span>
                   </template>
                   <template #cell(intituleSite)="data">
                     <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.intituleSite }}</b> </span>
@@ -312,6 +322,7 @@ export default {
       { key: "idoperation", label: "N° d'entrée" , sortable: true},
       { key: "dateoper", label: "Date Opération", sortable: true },
       { key: "heureoper", label: "heure", sortable: true },
+      { key: "typeproduit", label: "Type de produit", sortable: true },
       { key: "intituleSite", label: "Site", sortable: true },
       { key: "libelletypeopeparc", label: "Type D'Opération", sortable: true },
       { key: "statutenr", label: "statut", sortable: true },
@@ -501,17 +512,17 @@ export default {
     },
     onRowSelected(items) {
       items.isSelected = true;
-      
+      console.log('items ',items);
       this.selected = items;
       if (!php.empty(this.selected[0])) {
         this.isRowselected = true;
 
         if(this.selected[0].statutenr=='Brouillon'){
-          this.isToValidate=false
-          this.isToSubmit=true
+          this.isToValidate=true
+          this.isToSubmit=false
         }
         else if(this.selected[0].statutenr=='Soumise'){
-          this.isToValidate=true
+          this.isToValidate=false
           this.isToSubmit=false
         }
         else{
@@ -557,6 +568,7 @@ export default {
               elt.heureoper !== null
                 ? this.$dayjs(elt.heureoper).format("HH:mm")
                 : "";
+            elt.typeproduit = elt.typeProduit=="GR" ?"Grumes": "Débités"
             //elt.siteoperation = elt.siteoperation.intitule;
 
             return elt;

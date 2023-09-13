@@ -14,16 +14,17 @@
             <b-collapse id="collapse-4" v-model="visible">
               <b-card class="b-card">
                 <b-row>
-
-                  <b-col cols="3">
-                    <sigif-form-group :label-cols="4" :label-cols-lg="4" label="Code type bénéficiaire" :reduceSize="width"/>
+                  <b-col cols="5">
+                    <sigif-form-group :sizeLabel="5" :sizeLabelLg="4" px="0.5" py="0.6" label="Code type bénéficiaire" reduceSize="w-50"/>
                   </b-col>
-                  <b-col cols="3">
-                    <sigif-form-group :label-cols="4" :label-cols-lg="4" label="Libelle type bénéficiaire" :reduceSize="width"/>
+                  <b-col cols="5">
+                    <sigif-form-group :sizeLabel="5" :sizeLabelLg="4" px="0.5" py="0.6" label="Libellé type bénéficiaire" reduceSize="w-50"/>
                   </b-col>
-                   <b-col cols="3">
-                    <b-form-group   label-cols="4" label-cols-lg="3" label-size="sm" label="Unité de répartition" label-for="input-sm">
-                        <v-select label="libelle"  :options="allEntitesForrestieres" class="custum-vselect-border" ></v-select>
+                </b-row>
+                <b-row class="d-flex justify-content-between">
+                  <b-col cols="5">
+                    <b-form-group   label-cols="5" label-cols-lg="4" label-size="sm" label="Unité de répartition" label-for="input-sm">
+                        <v-select label="libelle"  :options="allEntitesForrestieres" class="custom-select-type_titre" ></v-select>
                     </b-form-group>
                   </b-col>
 
@@ -33,95 +34,101 @@
                         <b-button class="search-bar-btn" style="color:rgb(0, 82, 44);"><a href="">Reinitialiser</a></b-button>
                     </div>
                   </b-col>
-
-                </b-row>
-                <b-row class="mt-5 position_absolute">
-                 
                 </b-row>
                 
               </b-card>
             </b-collapse>
           </div>
-          <!--entete des tableaux -->
-          <div class="m-0 px-2 table-header-border">
-            <b-row>
-             
-              <!-- tableau 1 -->
-              <b-col>
-              <b-col><h4 class="tab-header-left-text"> Liste des types de bénéficiaires</h4></b-col>
-              <b-col class="col-md-auto">
-                <span >
-                <a :disabled="canViewDetailsOperationParc" size="sm" :class="{'change-image-opacity': !canViewDetailsOperationParc,  'not-change-image-opacity': canViewDetailsOperationParc}" class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !canViewDetailsOperationParc}" src="@/assets/images/iconVISUALISER_16x16.png"></b-img>consulter</a>
-                </span>
-              </b-col>
-              </b-col>
-              
-              <!-- tableau 2 -->
-               <b-col>
-              <b-col><h4 class="tab-header-left-text">Unités ou métriques de répartition</h4></b-col>
-              <b-col class="col-md-auto">
-              </b-col>
-              </b-col>
-
-            </b-row>
-          </div>
-          <!--implémentation tableau proprement dite-->
+          <!--VISUALISATION DES TABLEAUX-->
           <b-row>
-            <!-- contenu tableau 1 -->
+            <!--partie de gauche-->
             <b-col>
-          <div class="ml-1">
-              <b-table  :busy="isBusy" hover  select-mode="single" responsive="sm" ref="selectableTable" selectable @row-selected="onRowSelected"
-                :items="items" 
-                :fields="fields1" 
-                :tbody-tr-class="rowClass" >
-                <template #table-busy>
-                  <div class="text-center text-success my-2">
-                    <b-spinner class="align-middle"></b-spinner>
-                    <strong class="ml-1">chargement...</strong>
-                  </div>
-                </template>
-                 <template #cell(index)="data"><b class="ml-1" style="color: #175131!important">{{ ++data.index }}</b> </template>
-                 <template #cell(actif)>
-                     <span  style="color: green; font-weight:bold"><i class="fa fa-check fa-lg" aria-hidden="true"></i></span>
-                </template>
-                <template #cell(estcemac)="data">
-                     <span v-if="data.estcemac==1"  style="color: green; font-weight:bold"><i class="fa fa-check fa-lg" aria-hidden="true"></i></span>
-                     <span v-else></span>
-                </template>
-              </b-table>
+              <div class="m-0 px-2 table-header-border">
+                <b-row>
+                  <!-- tableau 1 -->
+                  <b-col>
+                    <b-row>
+                      <b-col><h4 class="tab-header-left-text"> Liste des types de bénéficiaires</h4></b-col>
+                      <b-col class="col-md-auto">
+                        <span>
+                          <a :disabled="canViewDetailsOperationParc" size="sm" class="mx-1 simple-btn"><b-img src="@/assets/images/iconVISUALISER_16x16.png"></b-img>consulter</a>
+                        </span>
+                      </b-col>
+                    </b-row>
+                    
+                  </b-col>
+                </b-row>
+                <div class="ml-1">
+                  <b-table  :busy="isBusy" hover  select-mode="single" responsive="sm" ref="selectableTable" selectable @row-selected="onRowSelectedTypeBeneficiaire"
+                    :items="itemsTypesBeneficiaires" 
+                    :fields="fieldsTypesBeneficiaires" 
+                    :tbody-tr-class="rowClass">
+                    <template #table-busy>
+                      <div class="text-center text-success my-2">
+                        <b-spinner class="align-middle"></b-spinner>
+                        <strong class="ml-1">chargement...</strong>
+                      </div>
+                    </template>
+                    <template #cell(index)="data"><b class="ml-1" style="color: #175131!important">{{ ++data.index }}</b> </template>
+                    <template v-slot:head(code)="data">
+                      <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
+                    </template>
+                    <template v-slot:head(intitule)="data">
+                      <span v-html="data.field.label" style="color:green"></span>
+                    </template>
+                    <template #cell(code)="data">
+                      <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.code }}</b> </span>
+                    </template>
+                    <template #cell(intitule)="data">
+                      <span><b class="ml-1">{{ data.item.intitule }}</b> </span>
+                    </template>
+                  </b-table>
 
-              <!--AJOUT DE LA PAGINATION -->
-              <paginator hr="top" :offset="offset" :total="total" :limit="perPage" :page="currentPage" @pageChanged="changePage" @limitChanged="(limit) => {perPage = limit}" />  
-          </div>
-          </b-col>
-          
-          <!-- contenu tableau 2 -->
+                  <!--AJOUT DE LA PAGINATION -->
+                  <paginator hr="top" :offset="offset" :total="total" :limit="perPage" :page="currentPage" @pageChanged="changePage" @limitChanged="(limit) => {perPage = limit}" />  
+                </div>
+              </div>
+            </b-col>
+            <!--partie de droite-->
             <b-col>
-          <div class="ml-1">
-              <b-table  :busy="isBusy" hover  select-mode="single" responsive="sm" ref="selectableTable" selectable @row-selected="onRowSelected"
-                :items="items" 
-                :fields="fields2" 
-                :tbody-tr-class="rowClass" >
-                <template #table-busy>
-                  <div class="text-center text-success my-2">
-                    <b-spinner class="align-middle"></b-spinner>
-                    <strong class="ml-1">chargement...</strong>
-                  </div>
-                </template>
-                 <template #cell(index)="data"><b class="ml-1" style="color: #175131!important">{{ ++data.index }}</b> </template>
-                 <template #cell(actif)>
-                     <span  style="color: green; font-weight:bold"><i class="fa fa-check fa-lg" aria-hidden="true"></i></span>
-                </template>
-                <template #cell(estcemac)="data">
-                     <span v-if="data.estcemac==1"  style="color: green; font-weight:bold"><i class="fa fa-check fa-lg" aria-hidden="true"></i></span>
-                     <span v-else></span>
-                </template>
-              </b-table>
-
-              <!--AJOUT DE LA PAGINATION -->
-              <paginator hr="top" :offset="offset" :total="total" :limit="perPage" :page="currentPage" @pageChanged="changePage" @limitChanged="(limit) => {perPage = limit}" />  
-          </div>
-          </b-col>
+              <div class="m-0 px-2 table-header-border">
+                <b-row>
+                  <!-- tableau 1 -->
+                  <b-col>
+                    <b-col><h4 class="tab-header-left-text"> Unités ou métriques de Répartition</h4></b-col></b-col>
+                </b-row>
+                <div class="ml-1">
+                  <b-table  :busy="isBusy" hover  select-mode="single" responsive="sm" ref="selectableTable" selectable @row-selected="onRowSelectedTypeBeneficiaire"
+                    :items="itemsUnitesRepartition" 
+                    :fields="fieldsUnitesRepartition" 
+                    :tbody-tr-class="rowClass" show-empty>
+                    <template #table-busy>
+                      <div class="text-center text-success my-2">
+                        <b-spinner class="align-middle"></b-spinner>
+                        <strong class="ml-1">chargement...</strong>
+                      </div>
+                    </template>
+                    <template #empty>
+                        <h4 style="color:green" class="text-center">Aucune <span class="font-weight-bold">donnée</span> trouvée!!</h4>
+                  </template>
+                    <template v-slot:head(codeur)="data">
+                      <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
+                    </template>
+                    <template v-slot:head(libelle)="data">
+                      <span v-html="data.field.label" style="color:green"></span>
+                    </template>
+                    <template #cell(codeur)="data">
+                      <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.codeur }}</b> </span>
+                    </template>
+                    <template #cell(libelle)="data">
+                      <span><b class="ml-1">{{ data.item.libelle }}</b> </span>
+                    </template>
+                  </b-table>
+ 
+                </div>
+              </div>
+            </b-col>
+       
           </b-row>
 
     </div>
@@ -161,72 +168,22 @@ export default {
           { value: 'validée', text: 'validée' },
           { value: 'soumission en cours', text: 'soumission en cours' },
     ],
-    allEntitesForrestieres:[
-      { 
-        id:1,
-        libelle:'Mfoundi'
-      },
-      { 
-        id:2,
-        libelle:'Mbam'
-      },
-      { 
-        id:3,
-        libelle:'Lékié'
-      }
-    ],
+ 
 
     //données du tableaux
-    fields1: [
-        { key: 'code', label: 'Code' },
+    fieldsTypesBeneficiaires: [
+        { key: 'code', label: 'Code' ,thStyle:"width:35%" },
         { key: 'intitule', label: 'Intitulé' },
     ],
-    fields2: [
-        { key: 'datecrea', label: 'Coudeur' },
-        { key: 'usercrea', label: 'Libelle' }, 
+    elementsTypesBeneficiaires:[],
+    fieldsUnitesRepartition: [
+        { key: 'codeur', label: 'Codeur',thStyle:"width:35%" },
+        { key: 'libelle', label: 'Libelle' }, 
     ],
-    elements: [
+    elementsUnitesRepartition: [
     ],
 
     selected:{},
-    
-    /*propriétes lies au traitement d'une operation de parc */
-    allSitesOperations: [
-            {
-            title: ' Grande forèt amazioniènne',
-            icon: 'fa fa-database',
-            id: 1
-            },
-            {
-            title: '  Foret de Sambissa',
-            icon: 'fa fa-book',
-            id: 2
-            },
-            {
-            title: '  Foret Tropicale',
-            icon: 'fas fa-dollar-sign',
-            id:3
-            },
-            {
-            title: '  Foret de Manguissa',
-            icon: 'fa fa-pencil',
-            id:4
-            }
-    ],
-    op_status:[
-       { value: null, text: 'Please select an option' },
-       { value: 'a', text: 'This is First option' },
-       { value: 'b', text: 'Selected Option' },
-       { value: { C: '3PO' }, text: 'This is an option with object value' },
-       { value: 'd', text: 'This one is disabled', disabled: true }
-    ],
-    op_date:'2019-01-01 14:30',
-    op:{
-      site_concernee:'',
-      date_operation:'',
-      heure_operation:'',
-      statut:null
-    }
   }),
   computed:{
     /*propriétés liées aux accèes*/
@@ -238,8 +195,15 @@ export default {
     canSubmitOperationParc(){return true;},
     canPrintOperationParc(){ return false;},
 
-    items() { 
-      return this.elements.map((a, index) => {  
+    itemsTypesBeneficiaires() { 
+      return this.elementsTypesBeneficiaires.map((a, index) => {  
+        a.isFirst = index == 0        
+        a.isEven = index %2 == 0        
+        return a
+      })
+    },
+    itemsUnitesRepartition(){
+      return this.elementsUnitesRepartition.map((a, index) => {  
         a.isFirst = index == 0        
         a.isEven = index %2 == 0        
         return a
@@ -249,6 +213,13 @@ export default {
       return (this.currentPage * this.perPage) - this.perPage
     },
      ...mapGetters(['user'])
+  },
+  watch:{
+    elementsTypesBeneficiaires(value){
+      if(!php.empty(value)){
+        setTimeout(() => {this.$refs['selectableTable'].selectRow(0) }, 200);
+      }
+    },
   },
  
  methods: {
@@ -260,18 +231,16 @@ export default {
       return 
     }
   },
-  handleAddUser(){
-    this.getUsers();
-    this.$bvModal.hide('user-form')
-  },
-  onRowSelected(items) {
-    console.log('row selected',items);
+
+  onRowSelectedTypeBeneficiaire(items) {
     items.isSelected =true;
     this.isRowselected=true
-        this.selected = items
+    this.selected = items
+    console.log('items',items);
+    this.elementsUnitesRepartition=items[0].unitesRepartition||[]
+    
   },
-  addUser(){this.$bvModal.show('user-form')},
-  callEditOperationParc(){this.$bvModal.show('modal-lg')},
+
   getRequestParams(page, pageSize){
       let params= {
         page: 0,
@@ -293,21 +262,10 @@ getTypeBeneficiaire(){
         this.pageSize
       );
       this.$donneesReference.get("beneficiaires", {params}).then(response => {
-          console.log("=================== Données de reference ==================");
-          console.log(response.data.result.items);
-          console.log("===========================================================");
         this.total = response.data.result.totalItems
         this.currentPage = response.data.result.currentPage + 1
-        this.elements=response.data.result.items
-
-         this.elements = this.elements.map(elt =>{
-          elt.continent=elt.continent.libelle
-          elt.estcemac = elt.estcemac == 1 ? true : false
-
-          return elt
-        })
+        this.elementsTypesBeneficiaires=response.data.result.items
 	     this.isBusy=false
-        setTimeout(() => {this.$refs['selectableTable'].selectRow(0) }, 200);
       })
       .catch((error) => {
         console.log(error)
@@ -361,6 +319,14 @@ getTypeBeneficiaire(){
 
 </script>
 <style scoped>
+.custom-select-type_titre{
+  --vs-dropdown-option--active-bg: #82C138;
+  --vs-dropdown-option--active-color: #fff;
+    --vs-selected-color: #1f1c1c;
+        /* Font */
+    --vs-font-size: 0.65rem;
+    --vs-line-height: 1.2;
+  }
 .position_absolute{
   position: absolute;
   bottom: 20px;

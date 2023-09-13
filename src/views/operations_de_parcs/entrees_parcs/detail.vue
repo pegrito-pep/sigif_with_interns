@@ -10,14 +10,15 @@
                     
                   </b-col>
                 <b-col class="col-md-auto">
-                  <span v-if="entreeParc.statut=='Soumise'" class="d-flex justify-content-between">
-                  <b-button v-if="isToValidate&&isMinfof" @click.prevent="validerLv" size="sm"   class="mx-1 px-1 simple-btn" style="cursor: pointer"><b-img src="@/assets/images/picto_enregistrer_vert.png"></b-img>Valider</b-button>
-                    <!--<a @click.prevent="validerEntreeparc" size="sm"   class="mx-1 px-1 simple-btn" style="cursor: pointer"><b-img src="@/assets/images/picto_enregistrer_vert.png"></b-img>Valider</a>-->
+                  <span v-if="!isMinfof">
+                    <span v-if="entreeParc.statut=='Brouillon'" class="d-flex justify-content-between">
+                    <b-button v-if="isToValidate" @click.prevent="validerEntreeparc" size="sm"   class="mx-1 px-1 simple-btn" style="cursor: pointer"><b-img src="@/assets/images/picto_enregistrer_vert.png"></b-img>Valider</b-button>
                     <a @click.prevent="fermer" size="sm" class="mx-1 simple-btn"  style="cursor:pointer" ><b-img src="@/assets/images/picto_retour_vert.png"></b-img>Fermer</a>
                   </span>
-                  <span v-else-if="entreeParc.statut=='Brouillon'" class="d-flex justify-content-between">
+                  <span v-else-if="entreeParc.statut=='Validée'" class="d-flex justify-content-between">
                     <a  @click.prevent="soumettreEntreeparc" size="sm"   class="mx-1 px-1 simple-btn" style="cursor: pointer"><b-img src="@/assets/images/picto_enregistrer_vert.png"></b-img>Soumettre</a>
                     <a @click.prevent="fermer" size="sm" class="mx-1 simple-btn"  style="cursor:pointer" ><b-img src="@/assets/images/picto_retour_vert.png"></b-img>Fermer</a>
+                  </span>
                   </span>
                   <span v-else>
                     <a @click.prevent="fermer" size="sm" class="mx-1 simple-btn" style="color:#82C138; cursor: pointer"><b-img src="@/assets/images/picto_retour_vert.png"></b-img>Fermer</a>
@@ -53,7 +54,7 @@
         <b-row>
           <b-col><h4 class="tab-header-left-text mb-0"> Liste des <span class="font-weight-bold" v-if="entreeParc.typeproduit=='GR'">Grumes</span><span class="font-weight-bold" v-if="entreeParc.typeproduit=='CL'">Colis</span> </h4>
           <export-excel
-              class   = "btn btn-default simple-btn"
+              class   = "btn btn-seondary"
               :data   = "json_data"
               :fields = "json_fields"
               worksheet = "export_entree_parc"
@@ -65,7 +66,7 @@
         </b-row>
       </div>
       <!--implémentation tableau proprement dite-->
-      <div class="ml-1" style="width:85%" >
+      <div class="ml-1" style="width:95%" >
         <b-table v-if="entreeParc.typeproduit=='GR'" sticky-header="500px"  :busy="isBusy" hover select-mode="single" ref="selectableGrumes" responsive="sm" :items="itemsProduits"  :fields="fieldsGrumes" selectable :tbody-tr-class="rowClass" >
             <template v-slot:head(validite)><span class="d-flex justify-content-around" style="color:green"><span class="mt-1 d-flex justify-content-between align-content-between">Validité</span><custom-select :setWidth="selectWidht" :options="options" :default="'valide'" class="select" /> </span></template>
             <template v-slot:head(codebarre)="data"><span v-html="data.field.label" style="color:green"></span></template>
@@ -74,8 +75,12 @@
             <template v-slot:head(essence)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template v-slot:head(dpb)="data"><span v-html="data.field.label" style="color:green"></span></template>
             <template v-slot:head(dgb)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(longueur)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span></template>
+            <template v-slot:head(longueur)="data"><span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span></template>
+            <template v-slot:head(volume)="data">
+              <span class="d-flex justify-content-center align-items-center">
+                <span v-html="data.field.label" style="color:green"></span><span style="color:green">(m<sup>3</sup>)</span>
+              </span>
+            </template>
 
               <template #table-busy>
                 <div class="text-center text-success my-2">
@@ -116,9 +121,9 @@
                 </template>   
         </b-table>
         <div v-else-if="entreeParc.typeproduit=='CL'">
-            <b-overlay class="m-4 px-2" rounded="sm" :show="showOverlayCodeData">
+            <b-overlay class="m-2 px-2" rounded="sm" :show="showOverlayCodeData">
               <div>
-                <b-table :items="itemsdebites"  :fields="fieldsDebites" class="mt-1" outlined   ref="selectableDebites" select-mode="single" selectable  :tbody-tr-class="rowClass">
+                <b-table :items="itemsdebites"  :fields="fieldsDebites" class="mt-1" outlined   ref="selectableDebites" select-mode="single" selectable  :tbody-tr-class="rowClass" @row-selected="onRowSelectedDebites">
                   <template v-slot:head(codebarre)="data">
                     <span v-html="data.field.label" style="color:green"></span>
                   </template>
@@ -131,7 +136,23 @@
                   <template v-slot:head(essence)="data">
                     <span v-html="data.field.label" style="color:green"></span>
                   </template>
-                 
+                  <template v-slot:head(longueur)="data">
+                    <span v-html="data.field.label" style="color:green"></span>
+                  </template>
+                  <template v-slot:head(largeur)="data">
+                    <span v-html="data.field.label" style="color:green"></span>
+                  </template>
+                  <template v-slot:head(epaisseur)="data">
+                    <span v-html="data.field.label" style="color:green"></span>
+                  </template>
+                  <template v-slot:head(nbPieces)="data">
+                    <span v-html="data.field.label" style="color:green"></span>
+                  </template>
+                  <template v-slot:head(volume)="data">
+                    <span class="d-flex justify-content-center align-items-center">
+                      <span v-html="data.field.label" style="color:green"></span><span style="color:green">(m<sup>3</sup>)</span>
+                    </span>
+                  </template>
              
                   <template #cell(index)="data"><b class="ml-1" style="color: #175131!important">{{ ++data.index }}</b> </template>
                   
@@ -147,7 +168,21 @@
                   <template #cell(essence)="data">
                     <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.essence" />
                   </template>
-                  
+                  <template #cell(longueur)="data">
+                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.longueur" />
+                  </template>
+                  <template #cell(largeur)="data">
+                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.largeur" />
+                  </template>
+                  <template #cell(epaisseur)="data">
+                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.epaisseur" />
+                  </template>
+                  <template #cell(nbPieces)="data">
+                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.nbPieces" />
+                  </template>
+                  <template #cell(volume)="data">
+                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.volume" />
+                  </template>
                 
                 </b-table>
                 <div class="px-2 table-header-border mt-5">
@@ -163,7 +198,7 @@
                   <template v-slot:head(nombrepiece)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
                   <template v-slot:head(poids)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
                   <template v-slot:head(superficie)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
-                  <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
+                  <template v-slot:head(volume)><span style="color:green; font-size:0.8rem">volumeu(m<sup>3</sup>)</span></template>
          
                     <template #table-busy>
                       <div class="text-center text-success my-2">
@@ -264,9 +299,9 @@ export default {
         { key: "codebarre", label: "Code à barres" },
         { key: "sequence", label: "Reférence code barre" }, 
         { key: "numdf10", label: "Ligne DF 10" },
-        { key: "dpb", label: "Diam. petit bout" },
-        { key: "dgb", label: "Diam. gros bout" },
-        { key: "longueur", label: "Longueur" },
+        { key: "dpb", label: "Diam. petit bout(cm)" },
+        { key: "dgb", label: "Diam. gros bout(cm)" },
+        { key: "longueur", label: "Longueur(m)" },
         { key: "volume", label: "Volume" }
      ],
      fieldsDebites: [
@@ -275,10 +310,10 @@ export default {
         { key: "sequence", label: "Reférence code barre" }, 
         { key: "numdf10", label: "Ligne DF 10" },
         { key: "essence", label: "Nom commercial" },
-        { key: "longueur", label: "Longueur" },
-        { key: "largeur", label: "Largeur" },
-        { key: "epaisseur", label: "Epaisseur" },
-        { key: "nbpieces", label: "Nbre de pièces" },
+        { key: "longueur", label: "Longueur(m)" },
+        { key: "largeur", label: "Largeur(cm)" },
+        { key: "epaisseur", label: "Epaisseur(m)" },
+        { key: "nbPieces", label: "Nbre de pièces" },
         { key: "volume", label: "Volume" },
      ],
       elementsProduits:[],
@@ -343,7 +378,7 @@ export default {
       }
     },
     isToValidate(){
-      if(!php.empty(this.entreeParc)&&this.entreeParc.statut=='Soumise'){
+      if(!php.empty(this.entreeParc)&&this.entreeParc.statut=='Brouillon'){
         return true;
       }
       return false; 
@@ -404,89 +439,106 @@ export default {
   },
   soumettreEntreeparc(){
       this.alertBeforeact('1')
-    },
-    validerEntreeparc(){
-      this.alertBeforeact('2')
-    },
-    async alertBeforeact(commande){
-      let title, message=''
-      if(commande=='1'){
-        title='Soumission'
-        message='ètes-vous sur de vouloir soumettre cette opération ?'
-      }
-      else if(commande=='2'){
-        title='rejet'
-        message='ètes-vous sur de vouloir valider cette opération ?'
+  },
+  validerEntreeparc(){
+    this.alertBeforeact('2')
+  },
+  async alertBeforeact(commande){
+    let title, message=''
+    if(commande=='1'){
+      title='Soumission'
+      message='ètes-vous sur de vouloir soumettre cette opération ?'
+    }
+    else if(commande=='2'){
+      title='rejet'
+      message='ètes-vous sur de vouloir valider cette opération ?'
 
-      }
-      const ok = await this.$refs.opeparcDialogue.show({
-               commande:commande,
-               title: commande==1?'Soumission':'Validation',
-               origine:'ent',
-               message:message,
-               idoperation:this.entreeParc.idoperation, 
-               okButton: 'Oui',
-               cancelButton: "Non",
-            })
-            //If you throw an error, the method will terminate here unless you surround it wil try/catch
-            if (ok) {
-              
+    }
+    const ok = await this.$refs.opeparcDialogue.show({
+              commande:commande,
+              title: commande==1?'Soumission':'Validation',
+              origine:'ent',
+              message:message,
+              idoperation:this.entreeParc.idoperation, 
+              okButton: 'Oui',
+              cancelButton: "Non",
+          })
+          //If you throw an error, the method will terminate here unless you surround it wil try/catch
+          if (ok) {
+            
+            this.$refs.opeparcDialogue._close();
+          } else {
               this.$refs.opeparcDialogue._close();
-            } else {
-               this.$refs.opeparcDialogue._close();
-            }
-    },
-    rowClass(item, type) {
-      if (item != "" && item != null) {
-        if (item.isEven) return "table-row-other";
-        if (!item || type !== "row") return "table-info";
-      } else {
-        return;
-      }
-    },
-    getRequestParams(page, pageSize){
-      let params= {
-        page: 0,
-        size: pageSize || 10
-      };
-      if(page && page > 0) {
-        params.page= page -1
-      }
-      return params;
-    },
-    async getDetailsEntreeParc() {
-      this.showOverlay = true
-      const params = this.getRequestParams(
-        this.currentPage,
-        this.pageSize
-      );
-      await this.$operationParc.get('entrees-parc/' +this.$route.params.id, {params}).then(response =>{
-        this.entreeParc= response.data.result.items
-        console.log('ep',this.entreeParc);
-        this.total=response.data.result.totalItems
-        this.currentPage=response.data.result.currentPage +1
-      } )
+          }
+  },
+  rowClass(item, type) {
+    if (item != "" && item != null) {
+      if (item.isEven) return "table-row-other";
+      if (!item || type !== "row") return "table-info";
+    } else {
+      return;
+    }
+  },
+  getRequestParams(page, pageSize){
+    let params= {
+      page: 0,
+      size: pageSize || 10
+    };
+    if(page && page > 0) {
+      params.page= page -1
+    }
+    return params;
+  },
+  async getDetailsEntreeParc() {
+    this.showOverlay = true
+    const params = this.getRequestParams(
+      this.currentPage,
+      this.pageSize
+    );
+    await this.$operationParc.get('entrees-parc/' +this.$route.params.id, {params}).then(response =>{
+      this.entreeParc= response.data.result.items
+      console.log('ep',this.entreeParc);
+      this.total=response.data.result.totalItems
+      this.currentPage=response.data.result.currentPage +1
+    } )
 
-      
+    
 
-      if(this.entreeParc.dateoper!=null&&this.entreeParc.dateoper!=''){
-        this.entreeParc.dateoper=this.entreeParc.dateoper.split('T')[0].replace(/-/g, "/")
+    if(this.entreeParc.dateoper!=null&&this.entreeParc.dateoper!=''){
+      this.entreeParc.dateoper=this.entreeParc.dateoper.split('T')[0].replace(/-/g, "/")
+    }
+    if(this.entreeParc.heureoper!=null&&this.entreeParc.heureoper!=''){
+      this.entreeParc.heureoper=this.entreeParc.heureoper.split('T')[1]
+      this.entreeParc.heureoper=this.entreeParc.heureoper.split('.')[0]
+    }
+    if(this.entreeParc.typeproduit=='GR'){
+      this.elementsProduits=this.entreeParc.produits
+      this.json_data=this.elementsProduits;
+    }
+    else if(this.entreeParc.typeproduit=='CL'){
+      if(!php.empty(this.entreeParc.produits)){
+        this.elementsdebites=this.entreeParc.produits
+        this.elementsdebites= 
+        this.elementsdebites.map((a, index) => {
+          a.longueur = this.elementsdebites[index].details!=null?
+          this.calculateSum(this.elementsdebites[index].details,'longueur'):0;
+          a.isEven = index % 2 == 0;
+          return a;
+        });
+        this.elementsdetailsdebites =this.entreeParc.produits[0].details
       }
-      if(this.entreeParc.heureoper!=null&&this.entreeParc.heureoper!=''){
-        this.entreeParc.heureoper=this.entreeParc.heureoper.split('T')[1]
-        this.entreeParc.heureoper=this.entreeParc.heureoper.split('.')[0]
-      }
-      if(this.entreeParc.typeproduit=='GR'){
-        this.elementsProduits=this.entreeParc.produits
-        this.json_data=this.elementsProduits;
-      }
-      else if(this.entreeParc.typeproduit=='CL'){
-        if(!php.empty(this.entreeParc.produits)){
-          this.elementsdebites=this.entreeParc.produits
-          this.elementsdetailsdebites =this.entreeParc.produits[0].details
-        }
-      }
-      this.showOverlay = false
+    }
+    this.showOverlay = false
+  },
+  calculateSum(array, property) {
+    const total = array.reduce((accumulator, object) => {
+      return accumulator + object[property];
+    }, 0);
+
+    return total;
+  },
+    onRowSelectedDebites(items){
+      this.elementsdetailsdebites =items[0].details
     },
     fermer() {this.$router.push({name: "entree_parcs"});},
 

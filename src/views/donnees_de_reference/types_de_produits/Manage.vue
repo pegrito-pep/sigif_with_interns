@@ -46,7 +46,7 @@
           <!--entete des tableaux -->
           <div class="m-0 px-2 table-header-border">
             <b-row>
-              <b-col><h4 class="tab-header-left-text"><b-img src="@/assets/images/picto_user_vert.png"></b-img> Liste des types de produits </h4></b-col>
+              <b-col><h4 class="tab-header-left-text">Liste des types de produits </h4></b-col>
               <b-col class="col-md-auto">
                 <span >
                 <b-button :disabled="!canCreateTypeProduit" size="sm" @click.prevent="addTypeProduit" class="mx-1 simple-btn" :class="{'change-image-opacity': !canCreateTypeProduit, 'not-change-image-opacity': canCreateTypeProduit}"><b-img  src="@/assets/images/iconPLUS_16x16.png"></b-img>créer</b-button>
@@ -61,7 +61,7 @@
             </b-row>
           </div>
           <!--implémentation tableau proprement dite-->
-          <div class="ml-1" style="width:75%">
+          <div class="mx-1">
               <b-table  :busy="isBusy" hover  select-mode="single" responsive="sm" ref="selectableTable" selectable @row-selected="onRowSelected"
                 :items="items" 
                 :fields="fields" 
