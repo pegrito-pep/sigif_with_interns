@@ -128,7 +128,7 @@
                 <template v-slot:head(diametrepb)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
                 <template v-slot:head(diametregb)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
                 <template v-slot:head(longueur)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
-                <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
+                <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span><span style="color:green">(m<sup>3</sup>)</span></template>
                 <template v-slot:head(abandonner)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
                 <template v-slot:head(position)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
                   <template #table-busy>
@@ -220,17 +220,17 @@ export default {
     fieldsGrumes: [
         { key: "index", label: "", thStyle: { width: "2%" } },
         { key: "codebarre", label: "codes à barres" },{ key: "reference", label: "Référence" },
-        { key: "lignedf10", label: "Ligne DF 10" }, { key: "essence", label: "Essence", thStyle: { width: "30%" } }, { key: "diametrepb", label: "Diamètre petit bout" },
-        { key: "diametregb", label: "Diamètre gros bout" }, { key: "longueur", label: "Longueur(m)" },
+        { key: "lignedf10", label: "Ligne DF 10" }, { key: "essence", label: "Essence", thStyle: { width: "30%" } }, { key: "diametrepb", label: "Diamètre petit bout(cm)" },
+        { key: "diametregb", label: "Diamètre gros bout(cm)" }, { key: "longueur", label: "Longueur(m)" },
         { key: "volume", label: "Volume" }
     ],
     itemsGrumes:[],
     fieldsBillons: [
         { key: "index", label: "", thStyle: { width: "2%" } },
         { key: "codebarre", label: "code barre", thStyle: { width: "16%" }},{ key: "sequence", label: "Séquence" },
-        { key: "essence", label: "Essence", thStyle: { width: "15%" } }, { key: "numbillon", label: "N° Billon", thStyle: { width: "9%" } }, { key: "diametrepb", label: "Diamètre Petit bout", thStyle: { width: "10%" } },
-        { key: "diametregb", label: "Diamètre Gros bout", thStyle: { width: "12%" } }, 
-        { key: "longueur", label: "Longueur(m)", thStyle: { width: "9%" } }, { key: "volume", label: "Volume (m3)", thStyle: { width: "9%" }  }, { key: "abandonner", label: "Abandonné ?"  },
+        { key: "essence", label: "Essence", thStyle: { width: "15%" } }, { key: "numbillon", label: "N° Billon", thStyle: { width: "9%" } }, { key: "diametrepb", label: "Diamètre Petit bout(cm)", thStyle: { width: "10%" } },
+        { key: "diametregb", label: "Diamètre Gros bout(cm)", thStyle: { width: "12%" } }, 
+        { key: "longueur", label: "Longueur(m)", thStyle: { width: "9%" } }, { key: "volume", label: "Volume", thStyle: { width: "9%" }  }, { key: "abandonner", label: "Abandonné ?"  },
         { key: "position", label: "Position" },
     ],
     itemsBillons:[],

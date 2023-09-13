@@ -216,7 +216,7 @@
                    <template v-slot:head(diametrepb)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
                    <template v-slot:head(diametregb)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
                    <template v-slot:head(longueur)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
-                   <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
+                   <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span><span style="color:green">(m<sup>3</sup>)</span></template>
                    <template v-slot:head(abandonner)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
                    <template v-slot:head(position)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
                      <template #table-busy>
@@ -320,7 +320,7 @@
                  <template v-slot:head(nombrepiece)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
                  <template v-slot:head(poids)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
                  <template v-slot:head(superficie)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
-                 <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
+                 <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span><span style="color:green">(m<sup>3</sup>)</span></template>
         
                    <template #table-busy>
                      <div class="text-center text-success my-2">
@@ -415,10 +415,10 @@ export default {
         { key: "codebarre", label: "code barre", thStyle: { width: "10%" }},{ key: "sequence", label: "Séquence" },
         {key:"numdf10", label:" N° de la grume"},
         { key: "essence", label: "Nom Commercial", thStyle: { width: "15%" } }, 
-        { key: "diametrepb", label: "Diamètre Petit bout", thStyle: { width: "12%" } },
-        { key: "diametregb", label: "Diamètre Gros bout", thStyle: { width: "12%" } }, 
+        { key: "diametrepb", label: "Diamètre Petit bout(cm)", thStyle: { width: "12%" } },
+        { key: "diametregb", label: "Diamètre Gros bout(cm)", thStyle: { width: "12%" } }, 
         { key: "longueur", label: "Longueur(m)", thStyle: { width: "9%" } }, 
-        { key: "volume", label: "Volume (m3)", thStyle: { width: "9%" }  }, 
+        { key: "volume", label: "Volume", thStyle: { width: "9%" }  }, 
     ],
     fieldsLvd: [
         { key: "index", label: "", thStyle: { width: "2%" } },
