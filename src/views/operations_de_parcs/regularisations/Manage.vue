@@ -191,7 +191,7 @@
               <template v-slot:head(statutenr)="data">
                 <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
               </template>
-              <template v-slot:head(typeproduit)="data">
+              <template v-slot:head(typeProduit)="data">
                 <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
               </template>
               <template #empty>
@@ -212,9 +212,9 @@
               <template #cell(intitulesite)="data">
                 <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.intituleSite }}</b> </span>
               </template>
-              <template #cell(typeproduit)="data">
-                <span class="d-flex justify-content-center align-items-center" style="color:green">
-                  <b class="ml-1">{{ data.item.typeproduit }}</b> 
+              <template #cell(typeProduit)="data">
+                <span class="d-flex justify-content-center align-items-center">
+                  <b class="ml-1">{{ data.item.typeProduit }}</b> 
                 </span>
               </template>
               <template #cell(libelletypeopeparc)="data">
@@ -286,7 +286,7 @@ export default {
     //données du tableaux
     fields: [ { key: 'index', label: '' },{ key: 'idoperation', label: 'Entrée No' }, { key: 'dateope', label: 'Date Opération' },
               { key: 'heureoper', label: 'heure' }, { key: 'intituleSite', label: 'Site' },
-              { key: "typeproduit", label: "Type de produit", sortable: true }, 
+              { key: "typeProduit", label: "Type de produit", sortable: true }, 
               { key: 'libelletypeopeparc', label: 'Type Opération' }, { key: 'statutenr', label: 'statut' },
               ],
     elements: [],
@@ -498,7 +498,7 @@ export default {
               elt.heureoper !== null
                 ? this.$dayjs(elt.heureoper).format("HH:mm")
                 : "";
-
+            elt.typeProduit = elt.typeProduit=="GR" ?"Grumes": "Débités"
           return elt
         })
 		      this.isBusy=false
