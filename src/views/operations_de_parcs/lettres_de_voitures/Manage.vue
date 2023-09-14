@@ -122,9 +122,9 @@
                           label="Type de produit"
                           label-for="input-horizontal"
                         >
-                        <select  v-model="search.typeproduit" class="m-0 p-0" style="width: 50%;font-size:1rem; border-radius:0.25rem; height:26px!important;" >
-                          <option value="GR">Grumes</option>
-                          <option value="CL">Débités</option>
+                        <select  v-model="search.typelv" class="m-0 p-0" style="width: 50%;font-size:1rem; border-radius:0.25rem; height:26px!important;" >
+                          <option value="LVG">Grumes</option>
+                          <option value="LVD">Débités</option>
                         </select>
                     </b-form-group>
                   </b-col>
@@ -548,7 +548,6 @@ export default {
           datefin: this.search.datefin,
           entite: this.search.entite,
           statut: this.search.statut,
-          typeproduit:this.search.typeproduit,
           typelv: this.search.typelv,
           immatriculation: this.search.immatriculation,
           codebarre: this.search.codebarre,
@@ -562,23 +561,23 @@ export default {
         }
         this.isBusy=true
         this.$operationParc.post("lettres-voiture/search", searchToSubmit).then((response) => {
+
           this.total = response.data.result.totalItems
           this.currentPage = response.data.result.currentPage + 1
           this.elements=response.data.result.items
-        
-            this.elements = this.elements.map(elt =>{
-            elt.type_operation=elt.parcOperationTypeopeparc.libelle
-            elt.dateope =  elt.dateope !==null ? this.$dayjs(elt.dateope).format('DD/MM/YYYY') :""
-            elt.type_lettre_voiture=elt.parcOperationTypeopeparc.libelle
-            elt.sitedepart=elt.sitedepart!==null ? elt.sitedepart.intitule :""  
-            elt.sitedestination=elt.sitedestination!==null ? elt.sitedestination.intitule :""
-            //elt.status = elt.statutenr == 1 ? 'soumise' :"Brouillon"
+          this.quotalv = response.data.result.quotalv
+          this.brouillons= response.data.result.brouillons
+          this.elements = this.elements.map(elt =>{
+
+            elt.dateope = elt.dateope !== null
+                ? this.$dayjs(elt.dateope).format("DD/MM/YYYY")
+                : "";
+           // elt.status = elt.statutenr == 1 ? 'soumise' :"Brouillon"
 
             return elt
           })
-
           storage.set(this.$route.path ,JSON.stringify(this.search))
-            this.isBusy=false
+          this.isBusy=false
         })
         .catch((error) => {
           this.isBusy=false
@@ -590,7 +589,6 @@ export default {
         datefin: "",
         entite: "",
         statut: "",
-        typeproduit:"",
         typelv: "",
         immatriculation: "",
         sitedepart: "",

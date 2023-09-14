@@ -1,5 +1,5 @@
 <template>
-    <data-modal ref="popup" class="pops" largeur="500">
+    <data-modal ref="popup" class="pops" :largeur="500">
         <div class="header">
             <h2 class="err" style="font-size: 16px">{{ title }}</h2>
             <button type="button"  @click="_close" class="close" aria-label="Close">

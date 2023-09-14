@@ -246,6 +246,7 @@ export default {
       );
     await this.$operationParc.get('regulations/' +this.$route.params.id, {params}).then(response =>{
       this.regularisation =  response.data.result.items
+      console.log('régulartisation',this.regularisation);
       this.total = response.data.result.totalItems
       this.currentPage = response.data.result.currentPage+1
     })

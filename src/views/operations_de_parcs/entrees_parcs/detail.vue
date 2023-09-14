@@ -13,14 +13,12 @@
                   <span v-if="!isMinfof">
                     <span v-if="entreeParc.statut=='Brouillon'" class="d-flex justify-content-between">
                     <b-button v-if="isToValidate" @click.prevent="validerEntreeparc" size="sm"   class="mx-1 px-1 simple-btn" style="cursor: pointer"><b-img src="@/assets/images/picto_enregistrer_vert.png"></b-img>Valider</b-button>
-                    <a @click.prevent="fermer" size="sm" class="mx-1 simple-btn"  style="cursor:pointer" ><b-img src="@/assets/images/picto_retour_vert.png"></b-img>Fermer</a>
                   </span>
                   <span v-else-if="entreeParc.statut=='Validée'" class="d-flex justify-content-between">
                     <a  @click.prevent="soumettreEntreeparc" size="sm"   class="mx-1 px-1 simple-btn" style="cursor: pointer"><b-img src="@/assets/images/picto_enregistrer_vert.png"></b-img>Soumettre</a>
-                    <a @click.prevent="fermer" size="sm" class="mx-1 simple-btn"  style="cursor:pointer" ><b-img src="@/assets/images/picto_retour_vert.png"></b-img>Fermer</a>
                   </span>
                   </span>
-                  <span v-else>
+                  <span>
                     <a @click.prevent="fermer" size="sm" class="mx-1 simple-btn" style="color:#82C138; cursor: pointer"><b-img src="@/assets/images/picto_retour_vert.png"></b-img>Fermer</a>
                   </span>
                 </b-col>
@@ -47,21 +45,35 @@
             </p>
           </b-col>
         </b-row>
+        <b-row>
+          <b-col cols="3">
+            <P> Type de produits: 
+             <b-badge v-if="entreeParc.typeproduit=='GR'" pill variant="secondary">Grumes</b-badge> 
+             <b-badge v-if="entreeParc.typeproduit=='CL'" pill variant="secondary">Colis</b-badge> 
+            </P>
+          </b-col>
+        </b-row>
       </b-card>
+
     </div>
       <!--entete des tableaux -->
       <div class="m-0 px-2 table-header-border">
         <b-row>
-          <b-col><h4 class="tab-header-left-text mb-0"> Liste des <span class="font-weight-bold" v-if="entreeParc.typeproduit=='GR'">Grumes</span><span class="font-weight-bold" v-if="entreeParc.typeproduit=='CL'">Colis</span> </h4>
-          <export-excel
-              class   = "btn btn-seondary"
-              :data   = "json_data"
-              :fields = "json_fields"
-              worksheet = "export_entree_parc"
-              name    = "export_entree_parc.xls">
-              Exporter les produits
-          </export-excel>
-          
+          <b-col class="d-flex"><h4 class="tab-header-left-text mb-0"> Liste des Produits </h4>
+            <h4>
+              <b-button @click.prevent="exportData" variant="none">
+                <b-spinner v-if="exporting" small class="mx-2"></b-spinner>
+                <span v-else>exporter les produits</span>
+              </b-button>
+            </h4>
+        </b-col>
+        <b-col class="d-flex">
+          <h3  class="mx-2"><b-badge variant>{{ entreeParc.pieceNombreTotal }}
+            <span v-if="entreeParc.typeproduit=='GR'">grume<span v-if="entreeParc.pieceNombreTotal>1">s</span></span>
+            <span v-if="entreeParc.typeproduit=='CL'">Débités</span>
+            </b-badge>
+          </h3> 
+          <h3  class="mx-2"><b-badge><b>{{ entreeParc.volumeTotal  }} m <sup>3</sup></b></b-badge></h3> 
         </b-col>
         </b-row>
       </div>
@@ -145,7 +157,7 @@
                   <template v-slot:head(epaisseur)="data">
                     <span v-html="data.field.label" style="color:green"></span>
                   </template>
-                  <template v-slot:head(nbPieces)="data">
+                  <template v-slot:head(nombrePieces)="data">
                     <span v-html="data.field.label" style="color:green"></span>
                   </template>
                   <template v-slot:head(volume)="data">
@@ -177,8 +189,8 @@
                   <template #cell(epaisseur)="data">
                     <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.epaisseur" />
                   </template>
-                  <template #cell(nbPieces)="data">
-                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.nbPieces" />
+                  <template #cell(nombrePieces)="data">
+                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.nombrePieces" />
                   </template>
                   <template #cell(volume)="data">
                     <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.volume" />
@@ -269,20 +281,13 @@
   import OperationParcBox from '@/components/utils/operation_de_parc/ConfirmBoxDetail.vue';
   import InfosBox from '@/components/utils/ErrorBox.vue';
   import { mapGetters } from "vuex";
-
+  import Papa from "papaparse";
   Vue.use(excel)
 export default {
   name: "details_entree_parc",
   data: () => ({
-    json_fields: {
-      'CODE BARRE': 'codebarre',
-      'SEQUENCE': 'sequence',
-      'DF10': 'numdf10',
-      'ESSENCE': 'essence',
-      'DIAMETRE GB': 'dgb',
-      'DIAMETRE PB': 'dpb',
-      'LONGUEUR': 'longueur',
-    },
+    exporting:false,
+
     json_data: [],
     /**données liées au modal d'ajout d'un utilisateur */
     showOverlayCodeData:false,
@@ -297,7 +302,7 @@ export default {
      fieldsGrumes: [
         { key: "index", label: "", thStyle: { width: "2%" } },
         { key: "codebarre", label: "Code à barres" },
-        { key: "sequence", label: "Reférence code barre" }, 
+        { key: "sequence", label: "Reférence" }, 
         { key: "numdf10", label: "Ligne DF 10" },
         { key: "dpb", label: "Diam. petit bout(cm)" },
         { key: "dgb", label: "Diam. gros bout(cm)" },
@@ -307,13 +312,13 @@ export default {
      fieldsDebites: [
         { key: "index", label: "", thStyle: { width: "2%" } },
         { key: "codebarre", label: "Code à barres" },
-        { key: "sequence", label: "Reférence code barre" }, 
+        { key: "sequence", label: "Reférence" }, 
         { key: "numdf10", label: "Ligne DF 10" },
         { key: "essence", label: "Nom commercial" },
         { key: "longueur", label: "Longueur(m)" },
         { key: "largeur", label: "Largeur(cm)" },
         { key: "epaisseur", label: "Epaisseur(m)" },
-        { key: "nbPieces", label: "Nbre de pièces" },
+        { key: "nombrePieces", label: "Nbre de pièces" },
         { key: "volume", label: "Volume" },
      ],
       elementsProduits:[],
@@ -420,6 +425,56 @@ export default {
   },
  
  methods: {
+  exportData(){
+    this.exporting =true;
+    let data =[]
+    if(this.entreeParc.typeproduit=='GR'){
+      data=this.json_data.map(({ codebarre, sequence, numdf10, essence, dpb, dgb, longueur, volume}) => ({
+              codebarre, 
+              sequence, 
+              numdf10, 
+              essence,
+              essence, 
+              dpb,
+              dgb,
+              longueur,
+              volume
+            }))
+    }else if(this.entreeParc.typeproduit=='CL'){
+      data=this.json_data.map(({ codebarre, sequence, numdf10, essence, longueur, largeur,epaisseur,nombrePieces, volume}) => ({
+              codebarre, 
+              sequence, 
+              numdf10, 
+              essence,
+              essence, 
+              longueur,
+              largeur,
+              epaisseur,
+              nombrePieces,
+              volume
+            }))
+    }
+   try {
+    var blob = new Blob([Papa.unparse(data)], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement("a");
+
+      var url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", 'produits.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(()=>{
+        this.exporting =false;
+      }, 2000)
+
+   } catch (error) {
+    alert('oops error happenned !')
+    this.exporting =false;
+    
+   }
+  },
   async displayError(error){
     this.$refs.opeparcDialogue._close();
     const ok = await this.$refs.errorDialogue.show({
@@ -519,12 +574,7 @@ export default {
       if(!php.empty(this.entreeParc.produits)){
         this.elementsdebites=this.entreeParc.produits
         this.elementsdebites= 
-        this.elementsdebites.map((a, index) => {
-          a.longueur = this.elementsdebites[index].details!=null?
-          this.calculateSum(this.elementsdebites[index].details,'longueur'):0;
-          a.isEven = index % 2 == 0;
-          return a;
-        });
+        this.json_data=this.elementsdebites;
         this.elementsdetailsdebites =this.entreeParc.produits[0].details
       }
     }
