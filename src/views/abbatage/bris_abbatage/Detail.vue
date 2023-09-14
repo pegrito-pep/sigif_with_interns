@@ -100,6 +100,7 @@
               </template>
               <template v-slot:head(volume)="data">
                 <span class="d-flex justify-content-center align-items-center" v-html="data.field.label"></span>
+                <span>(m<sup>3</sup>)</span>
               </template>
               <template #cell(index)="data"><b class="ml-1" style="color: #175131!important">{{ ++data.index }}</b> </template>
               <template #cell(diampb)="data">
@@ -151,10 +152,10 @@ export default {
       { key: 'sequence', label: 'Séquence' },
       { key: 'utmy', label: 'UTMx' },
       { key: 'utmx', label: 'UTMy' },
-      { key: 'diampb', label :'Diamètre petit bout', thStyle: { width: "12%"}}, 
-      { key: 'diamgb', label: 'Diametre gros bout' },
-      { key: 'longueur', label: 'longueur' },
-      { key: 'volume', label : 'volume(en m)' },,
+      { key: 'diampb', label :'Diamètre petit bout (cm)', thStyle: { width: "12%"}}, 
+      { key: 'diamgb', label: 'Diametre gros bout (cm)' },
+      { key: 'longueur', label: 'longueur (m)' },
+      { key: 'volume', label : 'volume' },,
     ],
     elements:[],
     selected:{},

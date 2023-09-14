@@ -198,7 +198,7 @@ export default {
     canCreateAbbattage(){ return true; return this.hasAccess('CREER_ABATTAGE_TITRE') },
     canUpdateAbbattage(){ return this.hasAccess('MODIFIER_ABATTAGE_TITRE') },
     canDeleteAbbattage(){ return this.hasAccess('SUPPRIMER_ABATTAGE_TITRE') },
-    canViewDetailsAbbattage(){ return this.hasAccess('CONSULTER_ABATTAGE_TITRE') },
+    canViewDetailsAbbattage(){ return true; return this.hasAccess('CONSULTER_ABATTAGE_TITRE') },
     canSubmitAbbattage(){ return this.hasAccess('SOUMETTRE_ABATTAGE_TITRE') },
     canExportTiges(){ return true;   return this.hasAccess('EXPORTE_ABATTAGE_TIGES')},
     items() { 

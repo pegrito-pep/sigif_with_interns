@@ -83,7 +83,7 @@
               <template v-slot:head(diametrepb)="data"><span v-html="data.field.label" style="color:green"></span></template>
               <template v-slot:head(diametregb)="data"><span v-html="data.field.label" style="color:green"></span></template>
               <template v-slot:head(longueur)="data"><span v-html="data.field.label" style="color:green"></span></template>
-              <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span></template>
+              <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green"></span><span style=" color: green">(m<sup>3</sup>)</span></template>
               <template #table-busy>
                 <div class="text-center text-success my-2">
                   <b-spinner class="align-middle"></b-spinner>
@@ -147,10 +147,10 @@ export default {
       { key: 'sequence', label: 'séquence'},
       {key : 'numdf10', label :'No DF10'},
       { key: 'essence', label : 'Essence' }, 
-      { key: 'diametrepb', label : 'Diamètre petit bout' }, 
-      { key: 'diametregb', label : 'Diamètre gros bout' }, 
+      { key: 'diametrepb', label : 'Diamètre petit bout (cm)' }, 
+      { key: 'diametregb', label : 'Diamètre gros bout (cm)' }, 
       { key: 'longueur', label : 'Longueur(m)' }, 
-      { key: 'volume', label : 'Volume (m3)' }, 
+      { key: 'volume', label : 'Volume' }, 
     ],
     elements:[],
     commande:'',

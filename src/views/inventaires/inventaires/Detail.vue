@@ -171,6 +171,7 @@
                 </template>
                 <template v-slot:head(volume)="data">
                   <span v-html="data.field.label" style="color:green"></span>
+                  <span style="color:green">(m<sup>3</sup>)</span>
                 </template>
                 <template #table-busy>
                   <div class="text-center text-success my-2">
@@ -308,7 +309,7 @@ export default {
         { key:'codebarre', label:'code a barres',thStyle: { width: "8%" }},
         { key:'sequence', label:'Séquence',thStyle: { width: "8%" }},
         { key:'nomcommercial', label:'Nom commercial',thStyle: { width: "11%" }},
-        { key:'diametre', label:'Diamètre Tige'},
+        { key:'diametre', label:'Diamètre Tige (cm)'},
         { key:'numbloc', label:'No Bloc'},
         { key:'numuc', label:'No UC'},
         { key:'numtige', label:'No Tige'},
@@ -316,7 +317,7 @@ export default {
         { key:'zone', label:'Zone',thStyle: { width: "6%" }},
         { key:'utmx', label:'UTM X'},
         { key:'utmy', label:'UTM Y'},
-        { key:'volume', label:'Volume(m3)'},
+        { key:'volume', label:'Volume'},
 
     ],
     elements: [],
