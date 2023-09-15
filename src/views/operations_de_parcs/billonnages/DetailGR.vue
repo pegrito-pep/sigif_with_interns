@@ -42,13 +42,23 @@
             </p>
           </b-col>
         </b-row>
+        <b-row>
+          <b-col cols="3">
+            <P> Type de produit: 
+             <b-badge v-if="billonnage.typeproduit=='GR'" pill variant="secondary">Grumes</b-badge> 
+             <b-badge v-if="billonnage.typeproduit=='CL'" pill variant="secondary">Colis</b-badge> 
+            </P>
+          </b-col>
+        </b-row>
       </b-card>
       <!--entete des tableaux -->
         <div class="m-0 px-2 table-header-border">
           <b-row>
             <b-col class="d-flex"><h4 class="tab-header-left-text mb-0"> Liste des Grumes </h4>
-            <h4 class="mx-2">Nombre Total : <b>{{ billonnage.nbGrumes }}</b></h4>
-            <h4 class="mx-2">Volume Total : <b>{{ billonnage.volGrumes  }} m <sup>3</sup></b></h4>
+              <h3  class="mx-2"><b-badge variant>{{ billonnage.nbGrumes }}Grume<span v-if="billonnage.nbGrumes>1">s</span></b-badge></h3> 
+              <h3  class="mx-2"><b-badge><b>{{ billonnage.volGrumes  }} m <sup>3</sup></b></b-badge></h3> 
+            <!--<h4 class="mx-2">Nombre Total : <b>{{ billonnage.nbGrumes }}</b></h4>
+            <h4 class="mx-2">Volume Total : <b>{{ billonnage.volGrumes  }} m <sup>3</sup></b></h4>-->
             <b-button v-if="billonnage.statut=='Brouillon'" @click.prevent="validerBillonnage" size="sm"
               class="mx-1 simple-btn not-change-image-opacity" >
               <b-img  src="@/assets/images/iconVALIDER_16x16.png"></b-img>
@@ -63,7 +73,7 @@
         </div>
       <!--implémentation tableau proprement dite-->
         <div class="ml-1">
-             <b-table sticky-header="250px" :busy="isBusy" hover select-mode="single" responsive="sm" :items="itemsGrumes"  :fields="fieldsGrumes" :tbody-tr-class="rowClass" ref="tableGrumes" selectable @row-selected="onRowSelected">
+             <b-table sticky-header="250px" :busy="isBusy" hover select-mode="single" responsive="sm" :items="itemsGrumes"  :fields="fieldsGrumes" :tbody-tr-class="rowClass" ref="tableGrumes" selectable @row-selected="onRowSelectedGrumes">
                 <template v-slot:head(codebarre)="data"><span v-html="data.field.label" style="color:green"></span></template>
                 <template v-slot:head(reference)="data"><span v-html="data.field.label" style="color:green"></span></template>
                 <template v-slot:head(lignedf10)="data"><span v-html="data.field.label" style="color:green"></span></template>
@@ -112,15 +122,21 @@
           <div class="m-0 px-2 table-header-border">
             <b-row>
               <b-col class="d-flex"><h4 class="tab-header-left-text mb-0"> Liste des Billons </h4>
-                <h3  class="mx-2"><b-badge variant>{{ billonnage.nbBillons }}<span v-if="billonnage.nbBillons>1">s</span>Grume</b-badge></h3> 
+                <h3  class="mx-2"><b-badge variant>{{ billonnage.nbBillons }}Billon<span v-if="billonnage.nbBillons>1">s</span></b-badge></h3> 
                 <h3  class="mx-2"><b-badge><b>{{ billonnage.volBillons  }} m <sup>3</sup></b></b-badge></h3> 
-                <a href="" v-b-tooltip.hover.top="'Exporter les billons'"><h4><b-img src="@/assets/images/excel.png"></b-img></h4></a>
+                <h3  class="mx-2">
+                  <b-button @click.prevent="exportData" variant="none" v-b-tooltip.hover title="exporter">
+                    <b-spinner v-if="exporting" small class="mx-2" ></b-spinner>
+                    <b-img v-else src="@/assets/images/excel.png"></b-img>
+                  </b-button>
+                </h3> 
+                
               </b-col>
             </b-row>
           </div>
           <!--<div style="border-top:5px solid #82C138; min-height: 40px; border-bottom:5px solid #82C138;"></div>-->
           <div class="ml-1 mr-1">
-             <b-table sticky-header="250px" :busy="isBusyBillons" hover select-mode="single" responsive="sm" :items="itemsBillons"  :fields="fieldsBillons" :tbody-tr-class="rowClassBillons" ref="tableBillons" selectable @row-selected="onRowSelected" show-empty>
+             <b-table sticky-header="250px" :busy="isBusyBillons" hover select-mode="single" responsive="sm" :items="itemsBillons"  :fields="fieldsBillons" :tbody-tr-class="rowClassBillons" ref="tableBillons" selectable @row-selected="onRowSelectedBillons" show-empty>
                 <template v-slot:head(codebarre)="data"><span v-html="data.field.label"  style="color:green; margin-left:40%; font-size:0.7rem"></span></template>
                 <template v-slot:head(sequence)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
                 <template v-slot:head(essence)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
@@ -129,7 +145,7 @@
                 <template v-slot:head(diametregb)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
                 <template v-slot:head(longueur)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
                 <template v-slot:head(volume)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span><span style="color:green">(m<sup>3</sup>)</span></template>
-                <template v-slot:head(abandonner)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
+                <template v-slot:head(abandonne)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
                 <template v-slot:head(position)="data"><span v-html="data.field.label" style="color:green; font-size:0.7rem"></span></template>
                   <template #table-busy>
                     <div class="text-center text-success my-2">
@@ -159,7 +175,7 @@
                       <input type="text" disabled v-model="data.item.essence" class="form-control-xs m-1 w-75" style="background:#fff; border: 1px solid white;color: black">
                     </template> 
                     <template #cell(numbillon)="data">
-                      <input type="text" disabled v-model="data.item.numdf10" class="form-control-xs m-1 w-75" style="background:#fff; border: 1px solid white;color: black">
+                      <input type="text" disabled v-model="data.item.numdf10" class="form-control-xs m-1" style="background:#fff; border: 1px solid white;color: black;width:98%;">
                     </template> 
                     <template #cell(diametrepb)="data">
                       <input type="text" disabled v-model="data.item.dpb" class="form-control-xs m-1 w-75" style="background:#fff; border: 1px solid white;text-align: right;color: black">
@@ -173,13 +189,15 @@
                     <template #cell(volume)="data">
                       <input type="text" disabled v-model="data.item.volume" class="form-control-xs m-1 w-75" style="background:#fff; border: 1px solid white;text-align: right">
                     </template>
-                    <template #cell(abandonner)="data">
-                      <span disabled style="display: flex;justify-content: center;align-items: center;" ><b-form-checkbox  :checked="data.item.abandonner==0 ? 'true' : 'false'" disabled></b-form-checkbox></span>
+                    <template #cell(abandonne)="data">
+                      <span disabled style="display: flex;justify-content: center;align-items: center;" ><b-form-checkbox  :checked="data.item.abandonne==1 ? 'true' : 'false'" disabled></b-form-checkbox></span>
                     </template>
                     <template #cell(position)="data">
-                      <span>
-                        <select name="" id="" disabled><option :value="data.item.position"></option></select>
-                      </span>
+                        <select v-model="data.item.position" name="" id="" disabled>
+                          <option value="1">Tete</option>
+                          <option value="2">Milieu</option>
+                          <option value="3">Haut</option>
+                        </select>
                     </template>   
              </b-table>
           </div>
@@ -201,6 +219,7 @@
 <script>
   const php  = require ( 'phpjs' ) ;
   import TabHead from '@/components/TabHead.vue'
+  import Papa from "papaparse";
 
 export default {
   name: "detail-billonnage-GR",
@@ -224,28 +243,37 @@ export default {
         { key: "diametregb", label: "Diamètre gros bout(cm)" }, { key: "longueur", label: "Longueur(m)" },
         { key: "volume", label: "Volume" }
     ],
-    itemsGrumes:[],
+    elementsGrumes:[],
     fieldsBillons: [
         { key: "index", label: "", thStyle: { width: "2%" } },
         { key: "codebarre", label: "code barre", thStyle: { width: "16%" }},{ key: "sequence", label: "Séquence" },
         { key: "essence", label: "Essence", thStyle: { width: "15%" } }, { key: "numbillon", label: "N° Billon", thStyle: { width: "9%" } }, { key: "diametrepb", label: "Diamètre Petit bout(cm)", thStyle: { width: "10%" } },
         { key: "diametregb", label: "Diamètre Gros bout(cm)", thStyle: { width: "12%" } }, 
-        { key: "longueur", label: "Longueur(m)", thStyle: { width: "9%" } }, { key: "volume", label: "Volume", thStyle: { width: "9%" }  }, { key: "abandonner", label: "Abandonné ?"  },
+        { key: "longueur", label: "Longueur(m)", thStyle: { width: "9%" } }, { key: "volume", label: "Volume", thStyle: { width: "9%" }  }, { key: "abandonne", label: "Abandonné ?"  },
         { key: "position", label: "Position" },
     ],
-    itemsBillons:[],
-    options:["valide"],
+    elementsBillons:[],
     positions:[{libelle:"non défini"}],
     selected:{},
+    selectedBillons:{},
     setSelected:0,
     total:0,
     currentPage:1,
     perPage:10,
+    exporting:false
 
   }),
   computed:{
-    items() { 
-      return this.itemsProduits.map((a, index) => {  
+    itemsGrumes() { 
+      return this.elementsGrumes.map((a, index) => {  
+        a.isFirst = index == 0        
+        a.isEven = index %2 == 0 
+        a.isOdd = index %2 !== 0        
+        return a
+      })
+    },
+    itemsBillons() { 
+      return this.elementsBillons.map((a, index) => {  
         a.isFirst = index == 0        
         a.isEven = index %2 == 0 
         a.isOdd = index %2 !== 0        
@@ -258,6 +286,46 @@ export default {
   },
  
  methods: {
+  exportData(){
+    this.exporting =true;
+    let data =[]
+    if(this.billonnage.typeproduit=='GR'){
+      console.log('passage step 1');
+      data=this.elementsBillons.map(({ cbmere, codebarre,sequence, numdf10, essence, dpb, dgb, longueur, volume, abandonne, position}) => ({
+              cbmere,
+              codebarre, 
+              sequence, 
+              numdf10, 
+              essence,
+              dpb,
+              dgb,
+              longueur,
+              volume,
+              abandonne,
+              position
+            }))
+    }
+   try {
+    var blob = new Blob([Papa.unparse(data)], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement("a");
+
+      var url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", 'billons.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(()=>{
+        this.exporting =false;
+      }, 2000)
+
+   } catch (error) {
+    alert('oops error happenned !')
+    this.exporting =false;
+    
+   }
+  },
   rowClass(item, type) {
     if(item !=''&&item!=null){
       console.log('entree row class');
@@ -276,13 +344,14 @@ export default {
     }
   },
 
-   onRowSelected(items) {
+   onRowSelectedGrumes(items) {
     this.isBusyBillons = true
-    items.isSelected =true;
-        this.selected = items
-       // this.itemsBillons=this.selected[0].billons
+    this.selected = items
     setTimeout(() => {this.isBusyBillons = false }, 500)
-    console.log('row selected',this.selected);
+     this.elementsBillons=this.selected[0].billons
+  },
+  onRowSelectedBillons(items) {
+    this.selectedBillons = items
   },
   validerBillonnage(){
       this.showOverlay = true;
@@ -324,27 +393,19 @@ export default {
         this.pageSize
     );
     await this.$operationParc.get('billonages/' +this.$route.params.id, {params}).then(response =>{
-      console.log('response ',response.data.items);
+      console.log('billonnages ',response.data.items);
       this.billonnage=response.data.items
       this.total=response.data.totalItems
       this.currentPage=response.data.currentPage +1
     } )
-    console.log('date ',this.$dayjs(this.billonnage.dateoper).format('DD/MM/YYYY'));
-    console.log('heure ',this.$dayjs(this.billonnage.heureoper).format('HH:MM'));
-   /* if(this.billonnage.dateoper!=null&&this.billonnage.dateoper!=''){
-      this.billonnage.dateoper=this.billonnage.dateoper.split('T')[0].replace(/-/g, "/")
-    }
-    if(this.billonnage.heureoper!=null&&this.billonnage.heureoper!=''){
-      this.billonnage.heureoper=this.billonnage.heureoper.split('T')[1]
-       this.billonnage.heureoper=this.billonnage.heureoper.split('.')[0]
-    }*/
+
+  
     this.billonnage.volGrumes =  this.billonnage.volGrumes !=null ? this.billonnage.volGrumes.toFixed(3) :''
     this.billonnage.volBillons =  this.billonnage.volBillons !=null ? this.billonnage.volBillons.toFixed(3) :''
-    this.itemsGrumes=this.billonnage.grummes
-    this.itemsBillons=this.billonnage.billons
-    console.log('grumes ',this.itemsGrumes,' itembillons ',this.itemsBillons);
-    this.itemsBillons.map(elt => {
-      elt.volume =elt.volume !=null ? elt.volume.toFixed(3) :''
+    this.elementsGrumes=this.billonnage.grummes
+    this.elementsBillons=this.billonnage.grummes[0].billons
+    this.elementsBillons.map(elt => {
+      elt.volume = elt.volume !=null ? elt.volume.toFixed(3) :''
     })
     
     this.showOverlay = false

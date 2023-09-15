@@ -47,7 +47,7 @@
         </b-row>
         <b-row>
           <b-col cols="3">
-            <P> Type de produit: 
+            <P> Type de produits: 
              <b-badge v-if="entreeParc.typeproduit=='GR'" pill variant="secondary">Grumes</b-badge> 
              <b-badge v-if="entreeParc.typeproduit=='CL'" pill variant="secondary">Colis</b-badge> 
             </P>
@@ -252,9 +252,6 @@
             </b-overlay>
         </div>
       </div>
-        <error-dialogue ref="errorDialogue"></error-dialogue>
-        <infos-box ref="infosDialogue"></infos-box>
-        <operation-parc-box @echecopeparc="displayError" @succesopeparc="reloadPage" ref="opeparcDialogue"></operation-parc-box>
 
     </b-overlay>
   </div>
@@ -263,81 +260,16 @@
 
 <script>
   const php  = require ( 'phpjs' ) ;
-  import TabHead from '@/components/TabHead.vue'
-  import ErrorDialogue from '@/components/utils/AlertBox.vue';
-  import Vue from 'vue'
-  import excel from 'vue-excel-export'
-  import OperationParcBox from '@/components/utils/operation_de_parc/ConfirmBoxDetail.vue';
-  import InfosBox from '@/components/utils/ErrorBox.vue';
   import { mapGetters } from "vuex";
-  import Papa from "papaparse";
-  Vue.use(excel)
-export default {
-  name: "details_entree_parc",
-  data: () => ({
-    exporting:false,
 
-    json_data: [],
-    /**données liées au modal d'ajout d'un utilisateur */
-    showOverlayCodeData:false,
-    isBusyDetailsDebites:false,
-    showOverlay:false,
-    headerBgVariant:'success',
-    bodyBgVariant:'light',
+export default {
+  name: "details_valeurs_fob",
+  data: () => ({
+
     isBusy:false,
     isRowselected:false,
-    entreeParc:{},
-    selectWidht:"w-50",
-     fieldsGrumes: [
-        { key: "index", label: "", thStyle: { width: "2%" } },
-        { key: "codebarre", label: "Code à barres" },
-        { key: "sequence", label: "Reférence" }, 
-        { key: "numdf10", label: "Ligne DF 10" },
-        { key: "dpb", label: "Diam. petit bout(cm)" },
-        { key: "dgb", label: "Diam. gros bout(cm)" },
-        { key: "longueur", label: "Longueur(m)" },
-        { key: "volume", label: "Volume" }
-     ],
-     fieldsDebites: [
-        { key: "index", label: "", thStyle: { width: "2%" } },
-        { key: "codebarre", label: "Code à barres" },
-        { key: "sequence", label: "Reférence" }, 
-        { key: "numdf10", label: "Ligne DF 10" },
-        { key: "essence", label: "Nom commercial" },
-        { key: "longueur", label: "Longueur(m)" },
-        { key: "largeur", label: "Largeur(cm)" },
-        { key: "epaisseur", label: "Epaisseur(m)" },
-        { key: "nombrePieces", label: "Nbre de pièces" },
-        { key: "volume", label: "Volume" },
-     ],
-      elementsProduits:[],
-      elementsdebites:[],
-      fieldsDetailsDebites:[
-        { key: "index", label: "", thStyle: { width: "2%" } },
-        { key: "codebarre", label: "code barre", thStyle: { width: "10%" }},
-        { key: "epaisseur", label: "epaisseur de la pièce" },
-        {key:"longueur", label:"Longueur de la pièce"},
-        { key: "largeur", label: "Largeur de la pièce" },
-        { key: "nombrepiece", label: "Nbre de pièces", thStyle: { width: "15%" } }, 
-        { key: "poids", label: "Poids", thStyle: { width: "12%" } },
-        { key: "volume", label: "Volume (m3)", thStyle: { width: "9%" }  },
-        { key: "superficie", label: "Superficie", thStyle: { width: "12%"} },  
-      ],
-      elementsdetailsdebites:[],
-      options:["valide"],
-      selected:{},
-      offset:0,
-      limit:10,
-      total:0,
-      currentPage:1,
-      perPage:10,
-      offsetSites: 0,
-      limitSites: 10,
-      perPageSite: 7,
-      currentPageSite: 1,
-      sites:[],
-      searchSite:"",
-      submitted:false
+    valeurFob:{},
+     elementsdetailsdebites:[],
   }),
   components:{
     TabHead,
@@ -346,175 +278,29 @@ export default {
     InfosBox
   },
   watch:{
-    elementsProduits(value){
-      if(!php.empty(value)){
-        setTimeout(() => {this.$refs['selectableGrumes'].selectRow(0) }, 200);
-      }
-    },
-    elementsdebites(value){
-      if(!php.empty(value)){
-        setTimeout(() => {this.$refs['selectableDebites'].selectRow(0) }, 200);
-      }
-    },
-    elementsdetailsdebites(value){
-      if(!php.empty(value)){
-        setTimeout(() => {this.$refs['selectableTableDetailsDebites'].selectRow(0) }, 200);
-      }
-    },
+
+
   },
   computed:{
-    ...mapGetters(['user','hasAccess']), 
-    isMinfof(){ 
-      if(this.user.idOrganisation==0||this.user.typeOrganisation=='MF'){
-        return true;
-      }else{
-        return false;
-      }
-    },
-    isToValidate(){
-      if(!php.empty(this.entreeParc)&&this.entreeParc.statut=='Brouillon'){
-        return true;
-      }
-      return false; 
-    },
-    itemsProduits(){
-      return this.elementsProduits.map((a, index) => {
-        a.isFirst = index == 0;
-        a.isEven = index % 2 == 0;
-        return a;
-      });
-    },
-    itemsdebites(){
-      return this.elementsdebites.map((a, index) => {
-        a.isFirst = index == 0;
-        a.isEven = index % 2 == 0;
-        return a;
-      });
-    },
-    itemsDetailsDebites(){
-      return this.elementsdetailsdebites.map((a, index) => {
-        a.largeur = a.largeur!=null? a.largeur:0
-        a.longueur = a.longueur!=null? a.longueur:0
-        a.isFirst = index == 0;
-        a.isEven = index % 2 == 0;
-        return a;
-      });
-    },
-    items() { 
-      return this.itemsProduits.map((a, index) => {  
-        a.isFirst = index == 0        
-        a.isEven = index %2 == 0 
-        a.isOdd = index %2 !== 0        
-        return a
-      })
-    },
-    otherItems(){ return },
-
-   
+    ...mapGetters(['user','hasAccess']),   
   },
  
  methods: {
-  exportData(){
-    this.exporting =true;
-    let data =[]
-    if(this.entreeParc.typeproduit=='GR'){
-      data=this.json_data.map(({ codebarre, sequence, numdf10, essence, dpb, dgb, longueur, volume}) => ({
-              codebarre, 
-              sequence, 
-              numdf10, 
-              essence,
-              essence, 
-              dpb,
-              dgb,
-              longueur,
-              volume
-            }))
-    }else if(this.entreeParc.typeproduit=='CL'){
-      data=this.json_data.map(({ codebarre, sequence, numdf10, essence, longueur, largeur,epaisseur,nombrePieces, volume}) => ({
-              codebarre, 
-              sequence, 
-              numdf10, 
-              essence,
-              essence, 
-              longueur,
-              largeur,
-              epaisseur,
-              nombrePieces,
-              volume
-            }))
-    }
-   try {
-    var blob = new Blob([Papa.unparse(data)], { type: 'text/csv;charset=utf-8;' });
-      var link = document.createElement("a");
 
-      var url = URL.createObjectURL(blob);
-      link.setAttribute("href", url);
-      link.setAttribute("download", 'produits.csv');
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(()=>{
-        this.exporting =false;
-      }, 2000)
-
-   } catch (error) {
-    alert('oops error happenned !')
-    this.exporting =false;
-    
-   }
-  },
   async displayError(error){
     this.$refs.opeparcDialogue._close();
-    const ok = await this.$refs.errorDialogue.show({
-          title: 'Information',
-          message: error,
-        })
-        //If you throw an error, the method will terminate here unless you surround it wil try/catch
-        if (ok) {
-            this.$refs.errorDialogue._close();
-        } else {
+      const ok = await this.$refs.errorDialogue.show({
+        title: 'Information',
+        message: error,
+      })
+      //If you throw an error, the method will terminate here unless you surround it wil try/catch
+      if (ok) {
           this.$refs.errorDialogue._close();
-        }
+      } else {
+        this.$refs.errorDialogue._close();
+      }
   },
-  reloadPage(){
-    this.$refs.opeparcDialogue._close();
-    this.getDetailsEntreeParc()
-  },
-  soumettreEntreeparc(){
-      this.alertBeforeact('1')
-  },
-  validerEntreeparc(){
-    this.alertBeforeact('2')
-  },
-  async alertBeforeact(commande){
-    let title, message=''
-    if(commande=='1'){
-      title='Soumission'
-      message='ètes-vous sur de vouloir soumettre cette opération ?'
-    }
-    else if(commande=='2'){
-      title='rejet'
-      message='ètes-vous sur de vouloir valider cette opération ?'
-
-    }
-    const ok = await this.$refs.opeparcDialogue.show({
-              commande:commande,
-              title: commande==1?'Soumission':'Validation',
-              origine:'ent',
-              message:message,
-              idoperation:this.entreeParc.idoperation, 
-              okButton: 'Oui',
-              cancelButton: "Non",
-          })
-          //If you throw an error, the method will terminate here unless you surround it wil try/catch
-          if (ok) {
-            
-            this.$refs.opeparcDialogue._close();
-          } else {
-              this.$refs.opeparcDialogue._close();
-          }
-  },
+ 
   rowClass(item, type) {
     if (item != "" && item != null) {
       if (item.isEven) return "table-row-other";
@@ -533,52 +319,24 @@ export default {
     }
     return params;
   },
-  async getDetailsEntreeParc() {
+  async getDetailsValeurFob() {
     this.showOverlay = true
     const params = this.getRequestParams(
       this.currentPage,
       this.pageSize
     );
-    await this.$operationParc.get('entrees-parc/' +this.$route.params.id, {params}).then(response =>{
-      this.entreeParc= response.data.result.items
-      console.log('ep',this.entreeParc);
+    await this.$donneesReference.get('valeurs-fob/' +this.$route.params.id, {params}).then(response =>{
+      console.log('response',response);
+      this.valeurFob= response.data.result
       this.total=response.data.result.totalItems
       this.currentPage=response.data.result.currentPage +1
     } )
 
     
-
-    if(this.entreeParc.dateoper!=null&&this.entreeParc.dateoper!=''){
-      this.entreeParc.dateoper=this.entreeParc.dateoper.split('T')[0].replace(/-/g, "/")
-    }
-    if(this.entreeParc.heureoper!=null&&this.entreeParc.heureoper!=''){
-      this.entreeParc.heureoper=this.entreeParc.heureoper.split('T')[1]
-      this.entreeParc.heureoper=this.entreeParc.heureoper.split('.')[0]
-    }
-    if(this.entreeParc.typeproduit=='GR'){
-      this.elementsProduits=this.entreeParc.produits
-      this.json_data=this.elementsProduits;
-    }
-    else if(this.entreeParc.typeproduit=='CL'){
-      if(!php.empty(this.entreeParc.produits)){
-        this.elementsdebites=this.entreeParc.produits
-        this.elementsdebites= 
-        this.json_data=this.elementsdebites;
-        this.elementsdetailsdebites =this.entreeParc.produits[0].details
-      }
-    }
     this.showOverlay = false
   },
-  calculateSum(array, property) {
-    const total = array.reduce((accumulator, object) => {
-      return accumulator + object[property];
-    }, 0);
 
-    return total;
-  },
-    onRowSelectedDebites(items){
-      this.elementsdetailsdebites =items[0].details
-    },
+
     fermer() {this.$router.push({name: "entree_parcs"});},
 
     toggleSideBar() {
@@ -619,26 +377,7 @@ export default {
       this.currentPage = page;
       this.getDetailsEntreeParc();
     },
-    validerEntreeParc(){
-      this.showOverlay = true;
-      this.$operationParc.put('entrees-parc/valider/'+this.entreeParc.idoperation).then(response => {
-           App.notifySuccess(response.data.message)
-           return this.getDetailsEntreeParc();
-      }).catch(error => {
-          this.showOverlay = false
-          return this.errorHappened(error.response.data)
-      }) 
-    },
-    soumettreEntreeParc(){
-      this.showOverlay = true;
-      this.$operationParc.put('entrees-parc/soumettre/'+this.entreeParc.idoperation).then(response => {
-           App.notifySuccess(response.data.message)
-           return this.getDetailsEntreeParc();
-      }).catch(error => {
-          this.showOverlay = false
-          return this.errorHappened(error.response.data)
-      }) 
-    },
+
  
     async errorHappened(error) {
       const ok = await this.$refs.errorDialogue.show({
@@ -659,7 +398,7 @@ export default {
  },
  
   beforeMount() {
-    this.getDetailsEntreeParc();
+    this.getDetailsValeurFob();
   }
   }
 

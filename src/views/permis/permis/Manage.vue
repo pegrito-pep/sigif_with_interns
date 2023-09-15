@@ -718,7 +718,7 @@ export default {
     getDates(){
         let exact = 2000 + new Date().getYear() - 100;
         for (let index = 0; index < 5; index++) {
-        this.exercices.push({ libelle: exact - index, value: index + 1, },)
+        this.exercices.push(exact-index)
         }
         this.search.exercice=exact
     },

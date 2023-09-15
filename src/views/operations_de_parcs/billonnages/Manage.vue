@@ -205,9 +205,9 @@
                 <template #cell(intitulesite)="data">
                   <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.intitulesite }}</b> </span>
                 </template>
-                <template #cell(typeproduit)="data">
+                <template #cell(typeProduit)="data">
                   <span class="d-flex justify-content-center align-items-center">
-                    <b class="ml-1">{{ data.item.typeproduit }}</b> 
+                    <b class="ml-1">{{ data.item.typeProduit }}</b> 
                   </span>
                 </template>
                 <template #cell(libelletypeopeparc)="data">
@@ -274,7 +274,7 @@ export default {
 
     //données du tableaux
     fields: [ { key: 'index', label: '' },{ key: 'idoperation', label: 'N° d\'entrée', sortable: true }, { key: 'dateoper', label: 'Date Opération', sortable: true },
-              { key: 'heureoper', label: 'heure', sortable: true }, { key: 'intitulesite', label: 'Site opération', sortable: true },{ key: "typeproduit", label: "Type de produit", sortable: true }, 
+              { key: 'heureoper', label: 'heure', sortable: true }, { key: 'intitulesite', label: 'Site opération', sortable: true },{ key: "typeProduit", label: "Type de produit", sortable: true }, 
               { key: 'libelletypeopeparc', label: 'Type Opération', sortable: true }, { key: 'statut', label: 'statut', sortable: true }],
               
     elements: [],
@@ -410,10 +410,10 @@ export default {
     }  
     },
     showDetails(){
-      if(this.selected[0].typeProduit=='Gr'){
+      if(this.selected[0].typeproduit=='GR'){
         this.$router.push({name: 'detail-billonnage-GR', params: { id: this.selected[0].idoperation }}); 
       } 
-      else if(this.selected[0].typeProduit=='Cl'){
+      else if(this.selected[0].typeproduit=='CL'){
         this.$router.push({name: 'detail-billonnage-CL', params: { id: this.selected[0].idoperation }}); 
       }
     },
@@ -502,12 +502,11 @@ export default {
         this.total = response.data.result.totalItems
         this.currentPage = response.data.result.currentPage + 1
         this.elements=response.data.result.items
-
         this.elements = this.elements.map(elt =>{
           //elt.type_operation=elt.parcOperationTypeopeparc.libelle
           elt.dateoper = elt.dateoper !==null ? this.$dayjs(elt.dateoper).format('DD/MM/YYYY') :""
           elt.heureoper = elt.heureoper !==null ?  this.$dayjs(elt.heureoper).format('HH:mm') : ""
-
+          elt.typeProduit = elt.typeproduit=="GR" ?"Grumes": "Débités"
           return elt
         })
 		      this.isBusy=false

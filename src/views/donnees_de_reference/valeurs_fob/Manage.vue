@@ -82,8 +82,8 @@
                 <b-button :disabled="!canCreateValeurFob"  @click.prevent="addValeurFob"  size="sm" :class="{'change-image-opacity': !canCreateValeurFob,  'not-change-image-opacity': canCreateValeurFob}" class="mx-1 simple-btn"><b-img  src="@/assets/images/iconPLUS_16x16.png"></b-img> Créer</b-button>
                 <span >
                 <b-button :disabled="!canUpdateValeurFob"  @click.prevent=""  size="sm" :class="{'change-image-opacity': !canUpdateValeurFob,  'not-change-image-opacity': canUpdateValeurFob}" class="mx-1 simple-btn"><b-img  src="@/assets/images/iconPLUS_16x16.png"></b-img> Créer</b-button>
-                <b-button :disabled="!canDeleteValeurFob" size="sm" :class="{'change-image-opacity': !canDeleteValeurFob,  'not-change-image-opacity': canDeleteValeurFob}" class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !canPrintOperationParc}" src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>imprimer taille</b-button>
-                <b-button :disabled="!canViewDetailsValeurFob" size="sm" :class="{'change-image-opacity': !canViewDetailsValeurFob,  'not-change-image-opacity': canViewDetailsValeurFob}" class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !canViewDetailsValeurFob}" src="@/assets/images/iconVISUALISER_16x16.png"></b-img>consulter</b-button>
+                <b-button :disabled="!canDeleteValeurFob" size="sm" :class="{'change-image-opacity': !canDeleteValeurFob,  'not-change-image-opacity': canDeleteValeurFob}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>imprimer taille</b-button>
+                <b-button @click.prevent="showDetails" :disabled="!canViewDetailsValeurFob" size="sm" :class="{'change-image-opacity': !canViewDetailsValeurFob,  'not-change-image-opacity': canViewDetailsValeurFob}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconVISUALISER_16x16.png"></b-img>consulter</b-button>
                 <b-button :disabled="!canActiveValeurFob" size="sm" :class="{'change-image-opacity': !canActiveValeurFob,  'not-change-image-opacity': canActiveValeurFob}" class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !canActiveValeurFob}" src="@/assets/images/iconVALIDER_16x16.png"></b-img>valider</b-button>
                 </span>
                 
@@ -199,7 +199,7 @@ export default {
     canCreateValeurFob(){ return true; return this.hasAccess('CREER_VALEUR_FOB')},
     canUpdateValeurFob(){return this.hasAccess('MODIFIER_VALEUR_FOB')},
     canDeleteValeurFob(){return this.hasAccess('SUPPRIMER_VALEUR_FOB')},
-    canViewDetailsValeurFob(){return this.hasAccess('CONSULTER_VALEUR_FOB')},
+    canViewDetailsValeurFob(){ return true; return this.hasAccess('CONSULTER_VALEUR_FOB')},
     canActiveValeurFob(){return this.hasAccess('ACTIVER_VALEUR_FOB')},
 
     items() { 
@@ -216,6 +216,12 @@ export default {
   },
  
  methods: {
+    showDetails(){
+      this.$router.push({
+        name: "details_valeurs_fob",
+        params: { id: this.selected[0].arreteFob },
+      });
+    },
    addValeurFob(){
      this.$refs['valeurfob-form'].show()
    },

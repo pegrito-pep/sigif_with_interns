@@ -1192,16 +1192,18 @@ export default {
             const obj=await this.$operationParc.get(`entrees-parc/${this.idoperation}`)
                 .then(resp=>{
                     if(resp.status===200)
-                        return resp.data
+                        return resp.data.result.items
                 })
                 .catch(err=>console.log(err))
-            console.log(obj)
+            console.log("obj",obj)
             
             this.search.datedebut=new Date(this.search.datedebut).toLocaleDateString()
             this.search.datefin=new Date(this.search.datefin).toLocaleDateString()
             this.search.entite=this.isMinfof?this.search.entite:this.entite.idorganisation
+            console.log('search',this.search);
             if(obj){
                 if(obj.typeproduit==='GR'){
+                    console.log('appel jasper grumes');
                     this.$jasper.post("ItextController/imprimerentreeparc/grume", {
                         "idorganisation":Number(this.search.entite),
                         "idoperation":Number(this.idoperation),
@@ -1221,13 +1223,7 @@ export default {
                             link.download = 'Imprimer une entrée parc.pdf';
                             link.click();
                             URL.revokeObjectURL(link.href)
-                            /*var fileURL = window.URL.createObjectURL(new Blob([response.data], {type: 'application/pdf'}));
-                            var fileLink = document.createElement('a');
-                            console.log('exécution ok 2');   
-                            fileLink.href = fileURL;
-                            fileLink.setAttribute('download', 'file.pdf');
-                            document.body.appendChild(fileLink);
-                            fileLink.click();*/
+                            
                             this.wait=false;
                             // console.log(response.data);   
                         }else{
