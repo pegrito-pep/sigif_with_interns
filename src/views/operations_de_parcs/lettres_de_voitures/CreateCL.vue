@@ -18,7 +18,7 @@
               </b-col> 
             <b-col class="col-md-auto">
               <span class="d-flex justify-content-between">
-                <a class="d-flex justify-content-center align-items-center mt-1">
+                <a v-if="lettrev.lvvierge=='true'" class="d-flex justify-content-center align-items-center mt-1">
                   <input type="number" v-model="lettrev.nbr" class="p-1" style="width: 60px; height:26px; border-radius: 1em"/><span style="color:black; font-weight: bold;">quantité</span> 
                 </a>
                 <b-spinner small v-if="submitted" class="ml-2"  style="margin-right: 5px;"></b-spinner>

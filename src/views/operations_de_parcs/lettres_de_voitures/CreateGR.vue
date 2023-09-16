@@ -21,7 +21,7 @@
               </b-col>-->
             <b-col class="col-md-auto">
               <span class="d-flex justify-content-between">
-                <a class="d-flex justify-content-center align-items-center mt-1">
+                <a v-if="lettrev.lvvierge=='true'" class="d-flex justify-content-center align-items-center mt-1">
                   <input type="number" v-model="lettrev.nbr" class="p-1" style="width: 60px; height:26px; border-radius: 1em"/><span style="color:black; font-weight: bold;">quantité</span> 
                 </a>
                 <b-spinner small v-if="submitted" class="ml-2"  style="margin-right: 5px;"></b-spinner>
@@ -345,6 +345,7 @@
      <error-dialogue ref="errorbox"></error-dialogue>
      <CodeBarreInfo ref="codebarreinfo"></CodeBarreInfo>
      <file-component ref="filecomponent" @importsuccessfullgrumes="handleDataImportedGrumes" @importsuccessfulldebites="handleDataImportedDebite" :dto="dto"></file-component>
+     <display-error ref="errorscreationinfo"></display-error>
 
   </div>
 
@@ -358,6 +359,7 @@ import ErrorDialogue from '@/components/utils/AlertBox.vue';
 import arrondissements from '@/data/arrondissements.js'
 import { mapGetters } from 'vuex';
 import FileComponent from '@/components/utils/operation_de_parc/ImportLettreVoitureFIle.vue';
+import DisplayError from '@/components/utils/operation_de_parc/DisplayError.vue';
 
 export default {
   name:"lettrelv-form",
@@ -365,7 +367,8 @@ export default {
     Calendar,
     CodeBarreInfo,
     ErrorDialogue,
-    FileComponent
+    FileComponent,
+    DisplayError
   },
    computed: {
     ...mapGetters(['user','hasAccess']),
@@ -1045,14 +1048,21 @@ export default {
         console.log('lettre de voiture ',this.lettrev);
           this.submitted = true 
           this.$operationParc.post('lettres-voiture', this.lettrev).then(response => {
-              this.submitted = false 
-              this.resetForm()
-              App.notifySuccess(response.data.message)
-              return this.$router.push({ name: "lettres-voiture" });
+            let result = response.data.result.Items
+              if(result!=undefined){
+                this.submitted = false 
+                this.resetForm()
+                App.notifySuccess(response.data.message)
+                return this.$router.push({ name: "lettres-voiture" });
+              }else{
+                  //this.anomalies=response.data.result.annomalies.toString()
+                this.displayError(response.data.result.annomalies.toString())
+                return this.submitted=false;
+              }  
           }).catch(error => {
-              console.log('entrée dans le catch');
+              console.log('entrée dans le catch',error);
               this.submitted = false
-              this.errorHappened(error.response.data)
+             // this.errorHappened(error.response.data)
           })
     },
     async sendAlertMessage(error){
@@ -1080,7 +1090,7 @@ export default {
             this.$refs.codebarreinfo._close();
            
           }
-  },
+    },
     async errorHappenedServeur() {
         const ok = await this.$refs.errorbox.show({
             title: 'Erreur survenue',
@@ -1095,6 +1105,19 @@ export default {
             this.resetForm()
         }
     },
+    //methodes d'erreur de création
+    async displayError(annomalies){
+        let message=annomalies!=undefined?annomalies:'erreur interne du serveur'
+        const ok = await this.$refs.errorscreationinfo.show({
+              title: 'Information',
+              anomalies:message
+            })
+            if (ok) {
+                this.$refs.errorscreationinfo._close();
+            } else {
+              this.$refs.errorscreationinfo._close();
+            }
+      },
   },
    async mounted() {
     this.getSites();
