@@ -10,17 +10,19 @@
       </div>
       <b-card class="b-card">
         <b-row>
-          <b-col cols="3">
+          <b-col cols="4">
             <P> Unité de transformation :  <strong>{{ ligneTransformation.uniteproduction }}</strong>
             </P>
           </b-col>
           <b-col cols="3">
             <P> Type de transformation : <strong>{{ ligneTransformation.typeTransformation }}</strong> </P>
           </b-col>
-          <b-col cols="3">
+          <b-col cols="4">
             <p> Nom de la ligne : <strong> {{ ligneTransformation.intitule }}</strong> </p>
           </b-col>
-          <b-col cols="3" v-if="ligneTransformation.description!=''&&ligneTransformation.description!=null">
+        </b-row>
+        <b-row>
+          <b-col cols="4" v-if="ligneTransformation.description!=''&&ligneTransformation.description!=null">
             <p> Description : 
               <span>{{ ligneTransformation.description }} </span>
             </p>

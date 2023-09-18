@@ -95,12 +95,12 @@
                     {{ status.libelle }}
                   </option>
                 </select>
-                <select v-else v-model="search.statut" class="m-0 p-0" style="width: 30%;font-size:1rem; border-radius:0.25rem; height: calc(1em + .500rem + 2px) !important;">
+                <select v-else v-model="search.statut" class="m-0 p-0" style="width: 30%;font-size:.85rem; border-radius:0.25rem; height: calc(0.8em + .300rem + 2px) !important;">
                   <option v-for="(status, i) in optionsStatus" :value="status.key" :key="i">
                     {{ status.libelle }}
                   </option>
                 </select>
-              <div style="float:right; width: 250px !important" class="">
+              <div style="float:right; width: 250px !important" class="mt-1">
                 <search-bar-actions-buttons @search="filterTable" @reset="reset"/>
               </div>                                                                                 
             </b-form-group>
