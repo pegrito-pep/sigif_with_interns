@@ -162,7 +162,7 @@
               <b-img src="@/assets/images/iconSUBMIT_16x16.png"></b-img>
               soumettre
               </b-button>-->
-              <b-button @click.prevent="imprimerEntreeParcPDF"  :disabled="!canPrintOperationParc" size="sm" :class="{'change-image-opacity': !canPrintOperationParc,  'not-change-image-opacity': canPrintOperationParc}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>imprimer</b-button>
+              <b-button @click.prevent="imprimerEntreeParcPDF"  :disabled="!canPrintOperationParc||wait" size="sm" :class="{'change-image-opacity': !canPrintOperationParc,  'not-change-image-opacity': canPrintOperationParc}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img><b-spinner v-if="wait" small></b-spinner><span v-else>imprimer</span> </b-button>
               <b-button :disabled="!canExportOperationEntreeParc" @click.prevent="exportData" size="sm" :class="{'change-image-opacity': !canExportOperationEntreeParc,  'not-change-image-opacity': canExportOperationEntreeParc}" class="mx-1 simple-btn"><b-img src="@/assets/images/excel.png"></b-img>Exporter</b-button>
               <span>
                 <b-dropdown toggle-class='customDropdown' id="dropdown" right size="sm" variant="none" text="Autres actions" menu-class="w-125">
@@ -356,6 +356,7 @@ export default {
     idoperation:'',
     title:'',
     action:'',
+    wait:false
   }),
   computed: {
     ...mapGetters(['user','hasAccess'])                                                                                                                                                                              ,   
@@ -464,12 +465,67 @@ export default {
 
     // imprimer une entrée parc
      imprimerEntreeParcPDF(){
-      this.$refs.listingEntreeParc.show({
+      console.log('app jasper',this.selected[0]);
+      if(this.selected[0].typeProduit==='GR'){
+                    console.log('appel jasper grumes');
+                    this.wait=true;
+                    this.$jasper.post("ItextController/imprimerentreeparc/grume", {
+                        "idoperation":Number(this.selected[0].idoperation),
+                    },{responseType:'blob'})
+                    .then((response) => { 
+                        // console.log('Search',this.search)
+                        if(response.status===200) {
+                            // console.log('res data:',response.data)
+                            const blob = new Blob([response.data], {type: 'application/pdf'});
+                            const link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = 'entree_parc.pdf';
+                            link.click();
+                            URL.revokeObjectURL(link.href)
+                            
+                            this.wait=false;
+                            // console.log(response.data);   
+                        }else{
+                            console.log(response)
+                        }
+                        })
+                    .catch((error) => {
+                        console.log(error);   
+                        this.wait=false;
+                    });
+                }
+                if(this.selected[0].typeProduit==='CL'){
+                    this.$jasper.post("ItextController/imprimerentreeparcColis", {
+                        "idoperation":Number(this.selected[0].idoperation),
+                    },{responseType:'blob'})
+                    .then((response) => { 
+
+                        console.log(this.search)
+                        if(response.status==200) {
+                            // console.log('res data:',response.data)
+                            const blob = new Blob([response.data], {type: 'application/pdf'});
+                            const link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = 'Imprimer entree parc colis.pdf';
+                            link.click();
+                            URL.revokeObjectURL(link.href)
+
+                            this.wait=false;
+                        }else{
+                            console.log(response)
+                        }
+                        })
+                    .catch((error) => {
+                        console.log('exécution bad 1');   
+                        this.wait=false;
+                    });
+                }
+      /*this.$refs.listingEntreeParc.show({
         title:'Impression d\'une entrée parc',
         commande:0,
         idoperation:this.selected[0].idoperation,
         showDate:false
-      })
+      })*/
     },
 
     /**METHODE DE TRAITEMENT EVENEMENT VALIDATION OK ENTREE PARC*/
