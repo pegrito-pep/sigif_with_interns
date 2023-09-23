@@ -1,5 +1,6 @@
 <template>
     <div id="cover" class="min-vh-100">
+      <b-overlay rounded="sm" :show="showOverlay">
           <div>
             <b-row>
               <b-col>
@@ -9,7 +10,7 @@
                   </button>
                   <span
                     class="ml-1 font-weight-bold"
-                  >Consultation lot d'abbattage  n°  {{ abbattage.idabatLot }}</span>
+                  >Consultation lot d'abbattage  n°  {{ abbattageDetail.numlot }}</span>
                 </h4>
               </b-col>
               <b-col class="col-md-auto">
@@ -24,53 +25,43 @@
              <b-card>
             <b-row>
 
-          <b-col cols="3">
+          <b-col cols="4">
               <div>
-                   No permis:<strong>0546/MINFOF/SETA</strong><br>
-                   No UFA:<strong>1</strong><br>
-                   Volume total:<strong>50.92</strong>
+                   No permis:<strong>{{ abbattageDetail.numpermis }}</strong><br>
+                   No UFA:<strong>{{ abbattageDetail.numufa }}</strong><br>
+                   Volume total:<strong>{{ abbattageDetail.volume }}</strong>
                
-                  
                 </div>
           </b-col>
-
-
-           <b-col cols="3">
+           <b-col cols="4">
              <div>
-               No titre:<strong>AEBGDF</strong><br>
-               No UFE:<strong>7</strong><br>
-              Nombre de grumes:<strong>5</strong>
-               
-               
-                </div>
-
+               No titre:<strong>{{ abbattageDetail.numtitre }}</strong><br>
+               No UFE:<strong>{{ abbattageDetail.idufe }}</strong><br>
+              Nombre de grumes:<strong>{{ abbattageDetail.nbGrumes }}</strong>
+              </div>
            </b-col>
 
 
-            <b-col cols="3">
+            <b-col cols="4">
                  <div>
-              Date permis:<strong>21/06/2022</strong><br>
-               No AAC:<strong>7</strong><br>
-              Dernier No grumes:<strong>4</strong>
+              Date permis:<strong>{{ $dayjs(abbattageDetail.dateAbattage).format("DD/MM/YYYY") }}</strong><br>
+               No AAC:<strong>{{ abbattageDetail.numaac }}</strong><br>
+              Dernier No grumes:<strong>{{ abbattageDetail.numDernGrume }}</strong>
                 
                 </div>
 
             </b-col>
-
-             <b-col cols="3">
+        </b-row>
+        <b-row class="my-1">
+          <b-col cols="3">
               <div>
-                 Type de titre: <strong>CD</strong><br>
-               No DFD10: <strong>202121</strong><br>
-              Date abbatage: <strong>05/04/2021</strong>
-
+                  Type de titre: <strong>{{ abbattageDetail.typetitre }}</strong><br>
+                  No DFD10: <strong>{{ abbattageDetail.numlot }}</strong><br>
+                  Date abbatage: <strong>{{ $dayjs(abbattageDetail.dateAbattage).format("DD/MM/YYYY") }}</strong>
               </div>
 
               </b-col>
-
-
-
         </b-row>
-
          </b-card>
 
           </div>
@@ -100,10 +91,35 @@
                 <template #cell(index)="data"><b class="ml-1" style="color: #175131!important">{{ ++data.index }}</b> </template>
                 <template #cell(numordre)="data">
                   <input type="text" v-model="data.item.numordre" class="form-control-xs m-1 w-75"  style="border: 1px solid white;">
-                </template> 
+                </template>
+                <template #cell(codebarretige)="data">
+                  <input type="text" v-model="data.item.codebarretige" class="form-control-xs m-1 w-75"  style="border: 1px solid white;">
+                </template>
+                <template #cell(codebarreabattage)="data">
+                  <input type="text" v-model="data.item.codebarreabattage" class="form-control-xs m-1 w-75"  style="border: 1px solid white;">
+                </template>
+                <template #cell(numsequence)="data">
+                  <input type="text" v-model="data.item.numsequence" class="form-control-xs m-1 w-75"  style="border: 1px solid white;">
+                </template>
+                <template #cell(essence)="data">
+                  <input type="text" v-model="data.item.essence" class="form-control-xs m-1 w-75"  style="border: 1px solid white;">
+                </template>
+                <template #cell(diametrepb)="data">
+                  <input type="text" v-model="data.item.diametrepb" class="form-control-xs m-1 w-75"  style="border: 1px solid white;">
+                </template>
+                <template #cell(diametregb)="data">
+                  <input type="text" v-model="data.item.diametregb" class="form-control-xs m-1 w-75"  style="border: 1px solid white;">
+                </template>
+                <template #cell(longueur)="data">
+                  <input type="text" v-model="data.item.longueur" class="form-control-xs m-1 w-75"  style="border: 1px solid white;">
+                </template>
+                <template #cell(volume)="data">
+                  <input type="text" v-model="data.item.volume" class="form-control-xs m-1 w-75"  style="border: 1px solid white;">
+                </template>
               </b-table>
               <paginator hr="top" :offset="offset" :total="total" :limit="perPage" :page="currentPage" @pageChanged="changePage" @limitChanged="(limit) => {perPage = limit}" />  
           </div>
+        </b-overlay>
     </div>
 
 </template>
@@ -121,15 +137,7 @@ export default {
     SimpleInput,
   },
   data: () => ({
-
-    numPemis :[{libelle :"0585/ASEBG/MINFOF/SETAT"}],
-    abbattage:{idabatLot: 1518,numpermis:"0585/ASEBG/MINFOF/SETAT", numtitre:'AEBGDF', numufa:1,numufe:5,numaac:7,numdfd10:202121, datepermis:"21/06/2022",typetitre:"CD",
-    volume:'50.92',nombregrumes:7,derniernumgrumme:4, dateabattage:"05/04/2019" },
-
-
-
-
-
+    abbattageDetail:{},
 
     isBusy:false,
     isRowselected:false,
@@ -142,44 +150,24 @@ export default {
 
     //données du tableaux
 fields: [ 
-	{ key: 'index', label: '' },{ key: 'numordre', label: 'N° d\'ordre',thStyle: { width: "10%"} }, { key: 'codebaretige', label: 'Code barre tige' },
-    { key: 'codebarreabbattage', label: 'Code Barre abbattage' }, { key: 'numsequentiel', label: 'N° Sequentiel' },{key : 'essence', label :'essence',thStyle: { width: "8%"}}, 
-    { key: 'diametrepetitbout', label : 'Diamètre petit bout (cm)' }, { key: 'diametregrosbout', label: 'Diametre gros but (cm)' }, { key: 'longueur', label: 'longueur (m)' },
-	{ key: 'volume', label : 'volume' }, { key: 'rejet', label: 'rejet' }, { key: 'motifrejet', label: 'Motif de rejet' }],
+	{ key: 'index', label: '' },
+  { key: 'numordre', label: 'N° d\'ordre',thStyle: { width: "10%"} }, 
+  { key: 'codebarretige', label: 'Code barre tige' },
+  { key: 'codebarreabattage', label: 'Code Barre abbattage' }, 
+  { key: 'numsequence', label: 'N° Sequentiel' },
+  {key : 'essence', label :'essence',thStyle: { width: "8%"}}, 
+  { key: 'diametrepb', label : 'Diamètre petit bout (cm)' }, 
+  { key: 'diametregb', label: 'Diametre gros but (cm)' }, 
+  { key: 'longueur', label: 'longueur (m)' },
+	{ key: 'volume', label : 'volume' }, 
+  { key: 'rejet', label: 'rejet' }, 
+  { key: 'motifrejet', label: 'Motif de rejet' }],
 	
 	
-	elements:[
-		{numordre :"25072021/", codebaretige: "3DZ836H3", codebarreabbattage: "HRA4VJ3J", numsequentiel: "4520-00001", essence: "Fraké/limbe"
-		,diametrepetitbout: 70,diametregrosbout: 90,longueur: 12,volume: 11.04,rejet: "NON",motifrejet:""},
-    {numordre :"25072021/", codebaretige: "3DZ836H3", codebarreabbattage: "HRA4VJ3J", numsequentiel: "4520-00001", essence: "Fraké/limbe"
-		,diametrepetitbout: 70,diametregrosbout: 90,longueur: 12,volume: 11.04,rejet: "NON",motifrejet:""},
-    {numordre :"25072021/", codebaretige: "3DZ836H3", codebarreabbattage: "HRA4VJ3J", numsequentiel: "4520-00001", essence: "Fraké/limbe"
-		,diametrepetitbout: 70,diametregrosbout: 90,longueur: 12,volume: 11.04,rejet: "NON",motifrejet:""}
-	],
+	elements:[],
     selected:{},
     /*propriétes lies au traitement d'une operation de parc */
-    allSitesOperations: [
-            {
-            title: ' Grande forèt amazioniènne',
-            icon: 'fa fa-database',
-            id: 1
-            },
-            {
-            title: '  Foret de Sambissa',
-            icon: 'fa fa-book',
-            id: 2
-            },
-            {
-            title: '  Foret Tropicale',
-            icon: 'fas fa-dollar-sign',
-            id:3
-            },
-            {
-            title: '  Foret de Manguissa',
-            icon: 'fa fa-pencil',
-            id:4
-            }
-    ],
+
     op_status:[
        { value: null, text: 'Please select an option' },
        { value: 'a', text: 'This is First option' },
@@ -212,6 +200,9 @@ fields: [
   },
  
  methods: {
+  changePage(){
+    console.log('to implement');
+  },
   fermer() {this.$router.push({name: "abbattages_titres"});},
   rowClass(item, type) {
     if(item !=''&&item!=null){
@@ -231,6 +222,7 @@ fields: [
  async getDetailsAbbattage() {
     this.showOverlay = true
     this.abbattageDetail = await this.$abbattage.get('tiges/' +this.$route.params.id).then(response => response.data.result)
+    this.elements = this.abbattageDetail.tiges
     this.showOverlay = false
   },
 

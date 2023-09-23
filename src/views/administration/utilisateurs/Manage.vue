@@ -110,8 +110,7 @@
             
             class="mx-1 simple-btn"
             ><b-img src="@/assets/images/iconPLUS_16x16.png"></b-img
-            >{{ $t("data.Créer") }}</b-button
-          >
+            >{{ $t("data.Créer") }}</b-button>
 
           <span>
             <b-button
@@ -123,48 +122,31 @@
                 'not-change-image-opacity': canUpdateUser,
               }"
               class="mx-1 simple-btn"
-              ><b-img src="@/assets/images/iconMODIFIER_16x16.png"
-              ></b-img
-              >{{ $t("data.Modifier") }}</b-button>
+              ><b-img src="@/assets/images/iconMODIFIER_16x16.png"></b-img>{{ $t("data.Modifier") }}</b-button>
           
             <delete-box ref="deleteDialogue"></delete-box>
-            <b-button @click="doDelete"
+            <b-button :disabled="!canDeleteUser" @click="doDelete"
              
               size="sm"
               :class="{
-                'change-image-opacity': !canDeleteuser,
-                'not-change-image-opacity': canDeleteuser,
+                'change-image-opacity': !canDeleteUser,
+                'not-change-image-opacity': canDeleteUser,
               }"
               class="mx-1 simple-btn"
               >   <b-img
                   src="@/assets/images/iconSUPPRIMER_16x16.png"
               >   </b-img
-              >{{ $t("data.Supprimer") }}
-              
-              </b-button>
-          
-             
-            
-            <b-button @click.prevent="showDetails" 
-              
-             
+              >{{ $t("data.Supprimer") }}</b-button>
+            <b-button :disabled="!canViewDetailsUser" @click.prevent="showDetails" 
               :class="{
                 'change-image-opacity': !canViewDetailsUser,
                 'not-change-image-opacity': canViewDetailsUser,
               }"
               class="mx-1 simple-btn"
-              ><b-img
-                :class="{
-                  'change-image-opacity': !canViewDetailsUser,
-                }"
-                src="@/assets/images/iconVISUALISER_16x16.png"
-              ></b-img
-              >{{ $t("data.Consulter") }}</b-button
-            >
+              ><b-img src="@/assets/images/iconVISUALISER_16x16.png"></b-img
+              >{{ $t("data.Consulter") }}</b-button>
 
-
-            <b-button  @click.prevent="activeUser"
-              :disabled="!canActiveUser"
+            <b-button :disabled="!canActiveUser" @click.prevent="activeUser"
               size="sm"
               :class="{
                 'change-image-opacity': !canActiveUser,
@@ -175,8 +157,7 @@
                 src="@/assets/images/iconVALIDER_16x16.png"
               ></b-img>Activer</b-button>
                 <active-box ref="activeboxDialogue"></active-box>
-            <b-button  @click.prevent="offlineUser"
-              :disabled="!canDesactiveUser"
+            <b-button :disabled="!canDesactiveUser" @click.prevent="offlineUser"
               size="sm"
               :class="{
                 'change-image-opacity': !canDesactiveUser,
@@ -187,12 +168,11 @@
                 :class="{ 'change-image-opacity': !canDesactiveUser }"
                 src="@/assets/images/iconSUPPRIMER_16x16.png"
               ></b-img
-              >Desactiver</b-button
-            >
+              >Desactiver</b-button>
              <offligne-box ref="offligneDialogue"></offligne-box>
 
 
-            <b-button   @click.prevent="ResetUser"
+            <b-button @click.prevent="ResetUser"
               :disabled="!canResetUserPassword"
               size="sm"
               :class="{
@@ -203,8 +183,7 @@
               ><b-img
                 src="@/assets/images/iconVALIDER_16x16.png"
               ></b-img
-              >Re-initialiser le mot de passe</b-button
-            >
+              >Re-initialiser le mot de passe</b-button>
             <reset-user ref="resetDialogue" @load="handleResetPassword"></reset-user>
           </span>
         </b-col>
@@ -267,9 +246,9 @@
       title="Enregistrer un utilisateur"
       header-class="custom-bg"
       header-text-variant="light"
-      hide-footer
+      hide-footer no-close-on-backdrop
     >
-      <user-form @userAdded="handleAddUser" @userAddedAndContinue="handleUserAddedAndContinue"/>
+      <user-form @userAdded="handleAddUser" @userAddedAndContinue="handleUserAddedAndContinue" @closeUserModal="closeUserModal"/>
     </b-modal> 
     <created-box ref="createdDialogue"></created-box>
 
@@ -279,7 +258,7 @@
         id="update-user-form"
         header-class="custom-bg"
         header-text-variant="light"
-        hide-footer
+        hide-footer no-close-on-backdrop
       >
         <template #modal-title> <span class="font-weight-bold">Modification utilisateur {{ usertoUpdate.compte }}</span></template>
         <update-user-form :usertoUpdate="usertoUpdate" @userUpdated="handleUserUpdated"/>
@@ -380,7 +359,7 @@ export default {
     canUpdateUser() {
       return this.hasAccess('MODIFIER_UTILISATEUR')
     },
-    canDeleteuser() {
+    canDeleteUser() {
       return this.hasAccess('SUPPRIMER_UTILISATEUR')
     },
     canViewDetailsUser() {
@@ -475,7 +454,9 @@ export default {
     addUser() {
       this.$bvModal.show("user-form");
     },
-
+    closeUserModal(){
+      this.$bvModal.hide("user-form");
+    },
    updateUserData(){
       if(!php.empty(this.selected[0])){this.usertoUpdate=this.selected[0]  }
       this.$bvModal.show("update-user-form");

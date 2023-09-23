@@ -140,10 +140,11 @@
                   <b-button :disabled="!canViewDetailsBillonnage" @click.prevent="showDetails" size="sm" :class="{'change-image-opacity': !canViewDetailsBillonnage,  'not-change-image-opacity': canViewDetailsBillonnage}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconVISUALISER_16x16.png"></b-img>consulter</b-button>
                   <b-button v-if="isMinfof" :disabled="!canSaveBillonnage" size="sm" :class="{'change-image-opacity': !canSaveBillonnage,  'not-change-image-opacity': canSaveBillonnage}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconVALIDER_16x16.png"></b-img>valider</b-button>
                   <b-button v-if="!isMinfof" :disabled="!canSubmitBillonnage" size="sm" :class="{'change-image-opacity': !canSubmitBillonnage,  'not-change-image-opacity': canSubmitBillonnage}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconSUBMIT_16x16.png"></b-img>soumettre</b-button>
-                  <b-button @click.prevent="imprimerBillonnagePDF"  :disabled="!canPrintBillonnage"  size="sm" :class="{'change-image-opacity': !canPrintBillonnage,  'not-change-image-opacity': canPrintBillonnage}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>imprimer</b-button>
+                  <b-button @click.prevent="imprimerBillonnagePDF"  :disabled="!canPrintBillonnage||wait" size="sm" :class="{'change-image-opacity': !canPrintBillonnage,  'not-change-image-opacity': canPrintBillonnage}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img><b-spinner v-if="wait" small></b-spinner><span v-else>imprimer</span> </b-button>
+                  <!---<b-button @click.prevent="imprimerBillonnagePDF"  :disabled="!canPrintBillonnage||wait"  size="sm" :class="{'change-image-opacity': !canPrintBillonnage,  'not-change-image-opacity': canPrintBillonnage}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>imprimer</b-button>-->
                   <b-button :disabled="!canExportBillonnages" @click.prevent="exportData" size="sm" :class="{'change-image-opacity': !canExportBillonnages,  'not-change-image-opacity': canExportBillonnages}" class="mx-1 simple-btn"><b-img src="@/assets/images/excel.png"></b-img>Exporter</b-button>
                   <b-dropdown toggle-class='customDropdown not-change-image-opacity' style="color:green;" variant='none' class="customDropdown m-md-2" id="dropdown-1" text="autre action">
-                    <b-dropdown-item>Listing des billonnages </b-dropdown-item>
+                    <b-dropdown-item @click.prevent="imprimerBillonnages">Listing des billonnages </b-dropdown-item>
                       <b-dropdown-item>Listing des billonnages par parc usine et par éssence</b-dropdown-item>
                       <b-dropdown-divider></b-dropdown-divider>
                       <b-dropdown-item>Listing des grumes mères billonnées</b-dropdown-item>
@@ -282,7 +283,8 @@ export default {
     sites:[],
     offsetSites: 0,
     limitSites: 10,
-    searchSite:''
+    searchSite:'',
+    wait:false
     /*propriétes lies au traitement d'une operation de parc */
   }),
   computed:{
@@ -375,8 +377,59 @@ export default {
     },
   },
   methods: {
-
+    // imprimer une entrée parc
     imprimerBillonnagePDF(){
+      if(this.selected[0].typeproduit==='GR'){
+        console.log('BILL grumes');
+        this.wait=true;
+        this.$jasper.post("ItextController/imprimerbillonnage", {
+                        "idoperation":Number(this.selected[0].idoperation),
+                    },{responseType:'blob'})
+          .then((response) => { 
+            if(response.status===200) {
+                const blob = new Blob([response.data], {type: 'application/pdf'});
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `Billonnage_${this.selected[0].idoperation}.pdf`;
+                link.click();
+                URL.revokeObjectURL(link.href)
+                
+                this.wait=false; 
+            }else{
+                console.log(response)
+            }
+          })
+          .catch((error) => {
+              console.log(error);   
+              this.wait=false;
+          });
+        }
+        if(this.selected[0].typeproduit==='CL'){
+          this.wait=true;
+          this.$jasper.post("ItextController/imprimerentreeparc/colis", {
+                "idoperation":Number(this.selected[0].idoperation),
+            },{responseType:'blob'})
+            .then((response) => { 
+              if(response.status===200) {
+                    const blob = new Blob([response.data], {type: 'application/pdf'});
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `Billonnage_${this.selected[0].idoperation}.pdf`;
+                    link.click();
+                    URL.revokeObjectURL(link.href)
+                    
+                    this.wait=false; 
+                }else{
+                    console.log(response)
+                }
+                })
+            .catch((error) => {
+                console.log('exécution bad 1');   
+                this.wait=false;
+            });
+        }
+     },
+    imprimerBillonnages(){
       this.$refs.listingEntreeParc.show({
         title:'Impression d\'un billonnage',
         commande:8,

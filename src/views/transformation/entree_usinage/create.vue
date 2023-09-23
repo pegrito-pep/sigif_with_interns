@@ -53,19 +53,19 @@
             </b-col>
             <b-col cols="4">
               <b-row class="m-2">
-                <b-col cols="4">
+                <b-col cols="6">
                   <label for="" class="m-0 p-0" style="font-weight:900"><span style="color: red;font-weight:900">*</span>Date opération</label>
                 </b-col>
-                <b-col cols="7">
-                  <input style="width:48%" class="sigif-input-date" :class="{ 'styleToSet': notSetDateoper }" type="date" v-model="form.dateoper" format="YYYY-MM-DD"/>
+                <b-col cols="5">
+                  <input style="width:96%" class="sigif-input-date" :class="{ 'styleToSet': notSetDateoper }" type="date" v-model="form.dateoper" format="YYYY-MM-DD"/>
                 </b-col>
               </b-row>
               <b-row class="m-2">
-                <b-col cols="4">
+                <b-col cols="6">
                   <label for="" class="m-0 p-0" style="font-weight:900"><span style="color: red;font-weight:900">*</span>Type de produit</label>
                 </b-col>
-                <b-col cols="7">
-                  <select :class="{ 'styleToSet': notSetTypeproduit }" name="typeproduits" v-model="form.typeproduit" class="m-0 p-0 "   style="width:48%;font-size:1rem; border-radius:0.25rem; height: calc(1em + .400rem) !important;">
+                <b-col cols="5">
+                  <select :class="{ 'styleToSet': notSetTypeproduit }" name="typeproduits" v-model="form.typeproduit" class="m-0 p-0 "   style="width:96%;font-size:1rem; border-radius:0.25rem; height: calc(1em + .400rem) !important;">
                     <option v-for="(type, index) in typesproduits" :value="type.IDTYPE_PRODUIT" :key="index" :selected="index==0" >
                       {{ type.LIBELLE }}
                     </option>
@@ -84,7 +84,8 @@
                   </b-col>
               </b-row>
             </div>
-            <div :class="{ 'widthfifty': form.typeproduit!='GR', 'widthseventyfive': form.typeproduit=='GR' }">
+            <!--<div :class="{ 'widthfifty': form.typeproduit!='GR', 'widthseventyfive': form.typeproduit=='GR' }">-->
+              <div class="widthninethyfive">
               <b-overlay rounded="sm" :show="showOverlayCodeData">
                 <b-table v-if="form.typeproduit=='GR'" height="50px" :items="itemsgrumes"  :fields="fieldsgrumes" :busy="isBusy" class="ml-4 px-2 mt-1" outlined   ref="selectableTablegrumes" select-mode="single" selectable @row-selected="onRowSelectedGrumes" :tbody-tr-class="rowClass">
                   <template v-slot:head(codebarre)="data">
@@ -841,6 +842,9 @@ export default {
 
 
 <style scoped>
+.widthninethyfive{
+  width:95%;
+}
 .widthfifty{
   width: 50%;
 }

@@ -92,48 +92,8 @@
       
  
     <b-row>
-      <!--<b-col lg="4" md="5" sm="12">
-        <div class="card overflow-hidden px-2 py-3">
-          <div class="d-flex justify-content-between">
-            <h4 class="m-1 font-weight-bold">liste des profils</h4>
-          </div>
-          <hr />
-          <b-overlay :show="showOverlay" rounded="sm">
-            <b-table
-              sticky-header="90%"
-              striped
-              hover
-              responsive
-              :items="roles"
-              :fields="[
-                { key: 'index', label: 'N°', sortable: true },
-
-                { key: 'libelle', label: 'Libellé' },
-              ]"
-              style="min-height: 10em"
-              class="table table-bordered"
-            >
-              <template #cell(index)="data">{{ ++data.index }}</template>
-              <template #cell(libelle)="data">{{
-                data.item.institule
-              }}</template>
-              <template #cell(action)="row">
-                <div style="display: flex">
-                  <b-button
-                    size="sm"
-                    variant="light"
-                    @click.prevent="deleteRoleUser(row.item)"
-                    class="ml-2"
-                    ><i style="width: 100%" class="ik ik-delete"></i
-                  ></b-button>
-                </div>
-              </template>
-            </b-table>
-          </b-overlay>
-        </div>
-      </b-col>-->
-      <b-col  lg="8" md="7" sm="12" class="pb-0 d-flex justify-content-center">
-        <div class="card overflow-hidden px-2 py-3">
+      
+        <div class="w-100 overflow-hidden mx-1 px-2 py-3">
           <div class="d-flex justify-content-center">
             <h4 class="m-1 font-weight-bold">liste des droits</h4>
           </div>
@@ -178,7 +138,7 @@
              <paginator hr="top" :offset="offset" :total="permissions.length" :limit="perPage" :page="currentPage" @pageChanged="(page)=> {currentPage = page}" @limitChanged="(limit) => {perPage = limit}" v-show="items.length > 5"/>
           </b-overlay>
         </div>
-      </b-col>
+
     </b-row>
   </div>
 </template>

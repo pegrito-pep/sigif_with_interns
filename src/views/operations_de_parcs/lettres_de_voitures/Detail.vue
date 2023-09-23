@@ -8,7 +8,12 @@
                 </button><span class="ml-1 font-weight-bold">Consultation lettre de voiture N°{{ lettreV.idoperation }}</span></h4>
                   
                 </b-col>
-              <b-col class="col-md-auto">
+              <b-col class="col-md-auto d-flex">
+                <span>
+                  <a @click.prevent="imprimerLVPDF" class="mx-1 simple-btn" style="cursor:pointer">
+                    <b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>imprimer
+                  </a>
+                </span>
                 <span v-if="lettreV.statutenr=='Soumise'" class="d-flex justify-content-between">
                   <b-button v-if="isToValidate&&isMinfof" @click.prevent="validerLv" size="sm"   class="mx-1 px-1 simple-btn" style="cursor: pointer"><b-img src="@/assets/images/picto_enregistrer_vert.png"></b-img>Valider</b-button>
                   <a @click.prevent="fermer" size="sm" class="mx-1 simple-btn"  style="cursor:pointer" ><b-img src="@/assets/images/picto_retour_vert.png"></b-img>Fermer</a>
@@ -182,14 +187,8 @@
             <b-row style="border: 2px solid #82C138;">
               <b-col class="d-flex">
                 <h4 class="tab-header-left-text mb-0"> Liste des élements </h4>
-                <a style="cursor: pointer" @click.prevent="imprimer" :disabled="!canPrintLettreVoiture" size="sm" class="mx-2 simple-btn" :class="{'change-image-opacity': !canPrintLettreVoiture,  'not-change-image-opacity': canPrintLettreVoiture}"><b-img  src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>
-                  imprimer
-                </a>
-                <a style="cursor: pointer" size="sm" class="mx-2 simple-btn"><b-img  src="@/assets/images/excel.png"></b-img>
-                  exporter
-                </a>
-                <h3 v-if="lettreV.typeopeparc=='LVG'" class="mx-2"><b-badge variant>{{ lettreV.nbrgrume }} Grume<span v-if="lettreV.nbrgrume>1">s</span></b-badge></h3> 
-                <h3 v-if="lettreV.typeopeparc=='LVG'" class="mx-2"><b-badge><b>{{ lettreV.volumegrume  }} m <sup>3</sup></b></b-badge></h3> 
+                <h3  class="mx-2"><b-badge variant>{{ lettreV.nbrgrume }} élement<span v-if="lettreV.nbrgrume>1">s</span></b-badge></h3> 
+                <h3  class="mx-2"><b-badge><b>{{ lettreV.volumegrume  }} m <sup>3</sup></b></b-badge></h3> 
               </b-col>
               <b-col class="col-md-auto">
                 <b-row class="d-flex justify-content-center align-items-center">
@@ -264,7 +263,7 @@
             <!--DEBUT SPECIFICITES LETTRE DE VOITURE DEBITE-->
             <b-container fluid v-if="lettreV.typeopeparc=='LVD'">
               <div class="ml-1 mr-1 w-75">
-                <b-table sticky-header="250px" :busy="isBusyDetailsDebites" hover select-mode="single" responsive="sm" :items="itemsLvd"  :fields="fieldsLvd" :tbody-tr-class="rowClassBillons" ref="tableBillons" selectable @row-selected="onRowSelected" show-empty>
+                <b-table sticky-header="250px" :busy="isBusyDetailsDebites" hover select-mode="single" responsive="sm" :items="itemsDebites"  :fields="fieldsLvd" :tbody-tr-class="rowClassBillons" ref="tabledebites" selectable @row-selected="onRowSelected" show-empty>
                    <template v-slot:head(codebarre)="data"><span v-html="data.field.label"  style="color:green; font-size:0.8rem"></span></template>
                    <template v-slot:head(reference)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
                    <template v-slot:head(nomcommercial)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
@@ -304,15 +303,12 @@
             <b-row style="border: 2px solid #82C138;">
               <b-col class="d-flex">
                 <h4 class="tab-header-left-text mb-0"> Détail des débités </h4>
-                <b-button  size="sm" class="mx-1 simple-btn"><b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>imprimer</b-button>
-                <b-button  size="sm" class="mx-1 simple-btn"><b-img src="@/assets/images/excel.png"></b-img>Exporter</b-button>
-               
               </b-col>
             </b-row>
           </div>
           <b-container fluid v-if="lettreV.typeopeparc=='LVD'">
             <div class="ml-1 mr-1">
-              <b-table sticky-header="250px" :busy="isBusyDetailsDebites" hover select-mode="single" responsive="sm" :items="itemsDetailsDebites"  :fields="fieldsDetailsDebites" :tbody-tr-class="rowClassBillons" ref="tableBillons" selectable @row-selected="onRowSelected" show-empty>
+              <b-table sticky-header="250px" :busy="isBusyDetailsDebites" hover select-mode="single" responsive="sm" :items="itemsDetailsDebites"  :fields="fieldsDetailsDebites" :tbody-tr-class="rowClassBillons" ref="tableDetailsDebites" selectable @row-selected="onRowSelected" show-empty>
                  <template v-slot:head(codebarre)="data"><span v-html="data.field.label"  style="color:green; font-size:0.8rem"></span></template>
                  <template v-slot:head(epaisseur)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
                  <template v-slot:head(largeur)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
@@ -348,8 +344,8 @@
                      <template #cell(nombrepiece)="data">
                       <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white; text-align:right" placeholder="" v-model="data.item.nombrepiece" />
                      </template>
-                     <template #cell(piods)="data">
-                      <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white; text-align:right" placeholder="" v-model="data.item.piods" />
+                     <template #cell(poids)="data">
+                      <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white; text-align:right" placeholder="" v-model="data.item.poids" />
                      </template>
                      <template #cell(superficie)="data">
                       <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white; text-align:right" placeholder="" v-model="data.item.superficie" />
@@ -405,10 +401,9 @@ export default {
         { key: "largeur", label: "largeur" },
         {key:"longueur", label:"Longueur de la pièce"},
         { key: "nombrepiece", label: "Nbre de pièces", thStyle: { width: "15%" } }, 
-        { key: "piods", label: "Poids", thStyle: { width: "12%" } },
+        { key: "poids", label: "Poids", thStyle: { width: "12%" } },
         { key: "superficie", label: "Superficie", thStyle: { width: "12%" } },  
-        { key: "volume", label: "Volume (m3)", thStyle: { width: "9%" }  }, ],
-    itemsDetailsDebites:[],
+        { key: "volume", label: "Volume", thStyle: { width: "9%" }  }, ],
     bois:{},
     fields: [
         { key: "index", label: "", thStyle: { width: "2%" } },
@@ -426,10 +421,13 @@ export default {
         { key: "reference", label: "Séquence", thStyle: { width: "15%" }  },
         { key: "nomcommercial", label: "Nom Commercial", thStyle: { width: "25%" }}, 
     ],
-    itemsLvd:[],
-    trueItemsLvd:[],
+    /*itemsLvd:[],
+    trueItemsLvd:[],*/
     elements:[],
     trueElements:[],
+    elementsDebites:[],
+    elementsDetailsDebites:[],
+    trueElmentsDetailsDebites:[],
     perPage: 10,
     currentPage: 1,
     total: 0
@@ -461,8 +459,23 @@ export default {
     },
     canPrintLettreVoiture(){return true; return this.hasAccess('IMPRIMER_LETTRES_DE_VOITURE');},
     items() { 
-      //return this.elements.map((a, index) => {  
       return this.elements.map((a, index) => {  
+        a.isFirst = index == 0        
+        a.isEven = index %2 == 0 
+        a.isOdd = index %2 !== 0        
+        return a
+      })
+    },
+    itemsDebites() { 
+      return this.elementsDebites.map((a, index) => {  
+        a.isFirst = index == 0        
+        a.isEven = index %2 == 0 
+        a.isOdd = index %2 !== 0        
+        return a
+      })
+    },
+    itemsDetailsDebites() { 
+      return this.elementsDetailsDebites.map((a, index) => {  
         a.isFirst = index == 0        
         a.isEven = index %2 == 0 
         a.isOdd = index %2 !== 0        
@@ -480,6 +493,11 @@ export default {
       setTimeout(() => {this.$refs['tableGrumes'].selectRow(0) }, 200);
       }
     },
+    elementsDebites(value){
+      if(!php.empty(value)){
+      setTimeout(() => {this.$refs['tabledebites'].selectRow(0) }, 200);
+      }
+    },
     search(value) {
         if(this.lettreV.typeopeparc=='LVG'){
             this.elements = !php.empty(value)
@@ -488,17 +506,30 @@ export default {
                 )
             : this.trueElements;
         }else if(this.lettreV.typeopeparc=='LVD'){
-            this.itemsLvd = !php.empty(value)
-            ? this.itemsLvd.filter(elt =>
+            this.elementsDebites = !php.empty(value)
+            ? this.elementsDebites.filter(elt =>
                 elt.codebarre.toLowerCase().includes(value.toLowerCase()) 
                 )
-            : this.trueItemsLvd;
+            : this.trueElmentsDebites;
         }
       
     
     }
  },
  methods: {
+  imprimerLVPDF(){
+    let url=''
+    if(this.lettreV.typeopeparc=='LVG'){
+      url=this.$JasperReport+'/JasperReport/lvg/'+this.lettreV.idoperation;
+    } 
+    else if(this.lettreV.typeopeparc=='LVD'){
+      url=this.$JasperReport+'/JasperReport/lvd/'+this.lettreV.idoperation;
+    } 
+    var a = document.createElement('a');
+    a.href = url;
+    a.setAttribute('target', '_blank');
+    a.click();
+  },
   async displayError(error){
     this.$refs.opeparcDialogue._close();
     const ok = await this.$refs.errorDialogue.show({
@@ -571,33 +602,44 @@ export default {
           this.pageSize
         );
         this.showOverlay = true
-        this.lettreV = await this.$operationParc.get('lettres-voiture/' +this.$route.params.id, {params}).then(response => response.data.result)
-        this.total = this.lettreV.listeElements.totalItems
-        this.currentPage = this.lettreV.listeElements.currentPage + 1
-        if(this.lettreV.dateoper!=null&&this.lettreV.dateoper!=''){
-          this.lettreV.dateoper=this.lettreV.dateoper.split('T')[0].replace(/-/g, "/")
-        }
-        if(this.lettreV.datechargement!=null&&this.lettreV.datechargement!=''){
-          this.lettreV.datechargement=this.lettreV.datechargement.split('T')[0].replace(/-/g, "/")
-        }
-        if(this.lettreV.heureoper!=null&&this.lettreV.heureoper!=''){
-          this.lettreV.heureoper=this.lettreV.heureoper.split('T')[1]
-          this.lettreV.heureoper=this.lettreV.heureoper.split('.')[0]
-        }
-        if(this.lettreV.typeopeparc=='LVG'){
-          if(this.lettreV.listeElements.details.length>0){
-          this.elements=this.trueElements=this.lettreV.listeElements.details
-        } 
-        } 
-        if(this.lettreV.typeopeparc=='LVD'){
-          if(this.lettreV.listeElements.details.length>0){
-            this.itemsLvd= this.lettreV.listeElements.details
-            this.itemsDetailsDebites= this.lettreV.listeElements.details[0].debites
-        } 
-          
-        }       
-        this.lettreV.volumegrume = this.lettreV.volumegrume!=null?this.lettreV.volumegrume.toFixed(3):''
-        this.showOverlay = false
+        await this.$operationParc.get('lettres-voiture/' +this.$route.params.id, {params})
+        .then(response => {
+          this.lettreV = response.data.result
+          this.total = this.lettreV.listeElements.totalItems
+          this.currentPage = this.lettreV.listeElements.currentPage + 1
+          if(this.lettreV.dateoper!=null&&this.lettreV.dateoper!=''){
+            this.lettreV.dateoper=this.lettreV.dateoper.split('T')[0].replace(/-/g, "/")
+          }
+          if(this.lettreV.datechargement!=null&&this.lettreV.datechargement!=''){
+            this.lettreV.datechargement=this.lettreV.datechargement.split('T')[0].replace(/-/g, "/")
+          }
+          if(this.lettreV.heureoper!=null&&this.lettreV.heureoper!=''){
+            this.lettreV.heureoper=this.lettreV.heureoper.split('T')[1]
+            this.lettreV.heureoper=this.lettreV.heureoper.split('.')[0]
+          }
+          if(this.lettreV.typeopeparc=='LVG'){
+            console.log('grumes',this.lettreV.listeElements.details);
+            if(!php.empty(this.lettreV.listeElements.details)){
+              this.elements=this.trueElements=this.lettreV.listeElements.details
+              this.lettreV.volumegrume = this.lettreV.volumegrume!=null?this.lettreV.volumegrume.toFixed(3):''
+            }
+          }
+          if(this.lettreV.typeopeparc=='LVD'){
+            if(!php.empty(this.lettreV.listeElements.details)){
+              this.elementsDebites = this.trueElmentsDebites = this.lettreV.listeElements.details
+              this.elementsDetailsDebites= this.lettreV.listeElements.details[0].debites
+            }    
+          } 
+          this.showOverlay = false 
+        })
+        .catch((error) => {
+          this.showOverlay = false 
+          if(error.response.data.status==500){
+            return App.alertError('Erreur interne du Serveur')
+          }
+          return App.alertError('Impossible de joindre le serveur')
+        });
+        
      },
       getRequestParams(page, pageSize){
         let params= {
@@ -616,52 +658,58 @@ export default {
 
      onRowSelected(items) {
       if(this.lettreV.typeopeparc=='LVD'){
-        this.itemsDetailsDebites= items[0].debites
+        this.isBusyDetailsDebites = true
+        if(!php.empty(items)){
+          this.elementsDetailsDebites= items[0].debites
+        }else{
+          this.elementsDetailsDebites =[]
+        }
+        setTimeout(() => {this.isBusyDetailsDebites = false }, 200);
+
       }
       console.log('row selected',items);
     },
     rowClassBillons(item, type) {
     if(item !=''&&item!=null){
-       return ''
+       return 'table-row-other'
     }else{
       return 
     }
   },
     toggleSideBar(){
-    var sidebar = document.querySelector('#sidebar');
-    var administration = document.querySelector('#administration');
-    var administrationItem = document.querySelectorAll('.administrationItem');
-    var actionButton = document.querySelector("#toggleSideBar");
+      var sidebar = document.querySelector('#sidebar');
+      var administration = document.querySelector('#administration');
+      var administrationItem = document.querySelectorAll('.administrationItem');
+      var actionButton = document.querySelector("#toggleSideBar");
+      if (sidebar.style.width !== '0px'){
+        sidebar.style.width = '0px';
+        sidebar.style.transition = 'all 0.5s ease';
+        administration.style.backgroundColor = 'white';
+        administration.style.transition = 'background-color 0.2s ease';
+        for (let index = 0; index < administrationItem.length; index++) {
+          const element = administrationItem[index];
+          element.style.opacity = '0';
+          element.style.transition = 'opacity 0.2s ease';
+        }
+        actionButton.innerHTML = '<i class="fas fa-bars fa-1x" style="font-size: 18px"></i>';
 
-    if (sidebar.style.width !== '0px'){
-      sidebar.style.width = '0px';
-      sidebar.style.transition = 'all 0.5s ease';
-      administration.style.backgroundColor = 'white';
-      administration.style.transition = 'background-color 0.2s ease';
-      for (let index = 0; index < administrationItem.length; index++) {
-        const element = administrationItem[index];
-        element.style.opacity = '0';
-        element.style.transition = 'opacity 0.2s ease';
       }
-      actionButton.innerHTML = '<i class="fas fa-bars fa-1x" style="font-size: 18px"></i>';
+      else {
+        sidebar.style.width = '250px';
+        sidebar.style.transition = 'all 0.3s ease';
+        administration.style.backgroundColor = '#82C138';
+        administration.style.transition = 'background-color 0.8s ease';
 
-    }
-    else {
-      sidebar.style.width = '250px';
-      sidebar.style.transition = 'all 0.3s ease';
-      administration.style.backgroundColor = '#82C138';
-      administration.style.transition = 'background-color 0.8s ease';
-
-      for (let index = 0; index < administrationItem.length; index++) {
-        const element = administrationItem[index];
-        element.style.opacity = '100%';
-        element.style.transition = 'opacity 1s ease';
+        for (let index = 0; index < administrationItem.length; index++) {
+          const element = administrationItem[index];
+          element.style.opacity = '100%';
+          element.style.transition = 'opacity 1s ease';
+        }
+        
+        actionButton.innerHTML = '<span aria-hidden="true" style="font-size: 30px">&times;</span>';
       }
-      
-      actionButton.innerHTML = '<span aria-hidden="true" style="font-size: 30px">&times;</span>';
-    }
     
-  },
+    },
  },
   beforeMount() {
     this.getDetailsLettre()

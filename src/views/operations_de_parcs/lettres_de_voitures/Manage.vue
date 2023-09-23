@@ -151,11 +151,12 @@
                 <b-button v-if="canUpdateLettreVoiture" @click.prevent="goToUpdateLettreForm" :disabled="!isToUpdate" style="cursor: pointer"  size="sm" :class="{'change-image-opacity': !isToUpdate,  'not-change-image-opacity': isToUpdate}"  class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !canUpdateLettreVoiture}" src="@/assets/images/iconMODIFIER_16x16.png"></b-img>modifier</b-button>
                 <b-button v-if="!canDeleteLettreVoiture" size="sm" :class="{'change-image-opacity': !canDeleteLettreVoiture,  'not-change-image-opacity': canDeleteLettreVoiture}" class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !canDeleteLettreVoiture}" src="@/assets/images/iconSUPPRIMER_16x16.png"></b-img>supprimer</b-button>
                 <b-button  :disabled="!canViewDetailsLettreVoiture" style="cursor: pointer" @click.prevent="showDetails()" size="sm" :class="{'change-image-opacity': !canViewDetailsLettreVoiture,  'not-change-image-opacity': canViewDetailsLettreVoiture}" class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !canViewDetailsLettreVoiture}" src="@/assets/images/iconVISUALISER_16x16.png"></b-img>consulter</b-button>
-                <b-button style="cursor: pointer" @click.prevent="sendTovalidateLv" :disabled="!isToValidate||!isMinfof" size="sm" :class="{'change-image-opacity': !isToValidate,  'not-change-image-opacity': isToValidate}" class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !canSaveLettreVoiture}" src="@/assets/images/iconVALIDER_16x16.png"></b-img>Soumettre</b-button>
-                <b-button style="cursor: pointer" @click.prevent="sendToSoumettreLv" :disabled="!isToSubmit" size="sm" :class="{'change-image-opacity': !isToSubmit,  'not-change-image-opacity': isToSubmit}" class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !isToSubmit}" src="@/assets/images/iconSUBMIT_16x16.png"></b-img>Valider</b-button>
-                <b-button style="cursor: pointer" @click.prevent="imprimer" :disabled="!canPrintLettreVoiture||!isRowselected" size="sm" class="mx-2 simple-btn" :class="{'change-image-opacity': !canPrintLettreVoiture,  'not-change-image-opacity': canPrintLettreVoiture}"><b-img  src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>
+                <b-button style="cursor: pointer" @click.prevent="sendToSoumettreLv" :disabled="!isToSubmit" size="sm" :class="{'change-image-opacity': !isToSubmit,  'not-change-image-opacity': isToSubmit}" class="mx-1 simple-btn"><b-img :class="{'change-image-opacity': !isToSubmit}" src="@/assets/images/iconSUBMIT_16x16.png"></b-img>Soumettre</b-button>
+                <!--<b-button style="cursor: pointer" @click.prevent="imprimer" :disabled="!canPrintLettreVoiture||!isRowselected" size="sm" class="mx-2 simple-btn" :class="{'change-image-opacity': !canPrintLettreVoiture,  'not-change-image-opacity': canPrintLettreVoiture}"><b-img  src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>
                   imprimer
-                </b-button>
+                </b-button>-->
+                <b-button @click.prevent="imprimerLVPDF" :disabled="!canPrintLettreVoiture||wait" size="sm" :class="{'change-image-opacity': !canPrintLettreVoiture,  'not-change-image-opacity': canPrintLettreVoiture}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img><b-spinner v-if="wait" small></b-spinner><span v-else>imprimer</span> </b-button>
+
                 </span>
                 <b-dropdown toggle-class='customDropdown not-change-image-opacity' style="color:green;" variant='none' class="customDropdown m-md-2" id="dropdown-1" text="autre action">
                   <b-dropdown-item>Listing des lèttres de voiture</b-dropdown-item>
@@ -188,8 +189,6 @@
                 <template #cell(statutenr)="data">
                   <span v-if="(data.item.statutenr==0)" style="font-weight:bold">Brouillon</span>
                   <span v-else-if="(data.item.statutenr==1)" style="font-weight:bold">Soumise</span>
-                  <span v-else-if="(data.item.statutenr==2)" style="font-weight:bold">Validée</span>
-                  <span v-else-if="(data.item.statutenr==3)" style="font-weight:bold">Soumission en cours</span>
              </template>
                  <template #cell(index)="data"><b class="ml-1" style="color: #175131!important">{{ ++data.index }}</b> </template>
               </b-table>
@@ -201,6 +200,9 @@
           <OpeParcDialog ref="opeparcDialogue"></OpeParcDialog>
           <!--CHOIX DU TYPE DE PRODUIT POUR LA CREATION DE LA LV-->
           <TypeProduitDialog ref="typeproduit"></TypeProduitDialog>
+          <!--display popup erreur creation LV-->
+          <warning-box ref="warningbox"></warning-box>
+
 
     </div>
 
@@ -211,6 +213,7 @@
   import { mapGetters } from 'vuex';
 import Calendar from 'vue2-slot-calendar';
 import InfosBox from '@/components/utils/InfosBox.vue';
+import WarningBox from '@/components/utils/WarningBox.vue';
 import OpeParcDialog from '@/components/utils/rapport/Operations_de_parc/MultiUsageDialog.vue'
 import TypeProduitDialog from '@/components/utils/operation_de_parc/TypeProduitDialog.vue'
 
@@ -218,10 +221,8 @@ import TypeProduitDialog from '@/components/utils/operation_de_parc/TypeProduitD
 export default {
   name: "lettres-de-voitures",
   data: () => ({
-    isToValidate:false,
-    isToSubmit:false,
     isToUpdate:false,
-    isRowselected:false,
+    isToSubmit:false,
     title: "Création lettre de voiture",
     isBusy:false,
     showOverlay:false,
@@ -274,7 +275,7 @@ export default {
     selected:{},
     /*propriétes lies au traitement d'une operation de parc */
     searchSubmitted:false,
-   
+    wait:false
     }),
   computed:{
     ...mapGetters(['user','hasAccess']),
@@ -286,13 +287,13 @@ export default {
         return false;
       }
     },
-    /*isRowselected(){
+    isRowselected(){
       if(!php.empty(this.selected)){
         return true;
       }
       return false
       return !php.empty(this.selected)
-    },*/
+    },
     canCreateLettreVoiture(){return this.hasAccess('CREER_LETTRES_DE_VOITURE')},
     canUpdateLettreVoiture(){
       return true;
@@ -364,11 +365,26 @@ export default {
  },
  components:{
   Calendar,
+  WarningBox,
   InfosBox,
   OpeParcDialog,
   TypeProduitDialog
  },
  methods: {
+  // imprimer une LV
+  imprimerLVPDF(){
+    let url=''
+    if(this.selected[0].typeopeparc=='LVG'){
+      url=this.$JasperReport+'/JasperReport/lvg/'+this.selected[0].idoperation;
+    } 
+    else if(this.selected[0].typeopeparc=='LVD'){
+      url=this.$JasperReport+'/JasperReport/lvd/'+this.selected[0].idoperation;
+    } 
+    var a = document.createElement('a');
+    a.href = url;
+    a.setAttribute('target', '_blank');
+    a.click();
+     },
   /**METHODE DE TRAITEMENT DE LA VALIDATION D'UNE ENTREE PARC*/
   sendTovalidateLv(){
     this.$router.push({ name: 'detail-lettres-voiture',  params: { id: this.selected[0].idoperation }});
@@ -380,21 +396,11 @@ export default {
   onRowSelected(items) {
       items.isSelected = true;
       this.selected = items;
+      console.log('selected ',this.selected);
       if (!php.empty(this.selected[0])) {
-        this.isRowselected =true;
-        if(this.selected[0].statutenr=='0'){
-          this.isToValidate=false
+       // this.isRowselected =true;
+       if(this.selected[0].statutenr=='0'){
           this.isToSubmit=true
-          this.isToUpdate=true
-        }
-        else if(this.selected[0].statutenr=='1'){
-          this.isToValidate=true
-          this.isToSubmit=false
-          this.isToUpdate=false
-        }
-        else if(this.selected[0].statutenr=='2'){
-          this.isToValidate=false
-          this.isToSubmit=false
           this.isToUpdate=true
         }
         else{
@@ -404,8 +410,7 @@ export default {
         }
       }
       else{
-        this.isRowselected =false;
-
+        //this.isRowselected =false;
       }
   },
   goToUpdateLettreForm(){
@@ -455,7 +460,8 @@ export default {
           this.$refs.infosbox._close();
       }
     }
-    else if(this.brouillons<this.quotalv){
+    else if(this.brouillons>this.quotalv){
+      return this.warningLvCreation()
       const ok = await this.$refs.infosbox.show({
         title: 'ERREUR',
         raison:1,
@@ -648,7 +654,7 @@ export default {
             console.log(error.message)
         }
       }
-    this.showOverlaySite=false
+      this.showOverlaySite=false
     },
     //notification de lettre de voiture ajoutée avec succès
     showAlert() {
@@ -674,6 +680,14 @@ export default {
       this.searchdest = query
       this.offsetdest = 0
     },
+    async warningLvCreation(){
+      const ok = await this.$refs.warningbox.show({
+        title: 'opération inappropriée',
+       // nbLvBrouillons:this.brouillons,
+        nbLvBrouillons:225,
+        quotaLv:this.quotalv,
+      })
+    }
   
  },
   mounted(){

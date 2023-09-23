@@ -911,7 +911,7 @@ export default {
           }
         }) 
       }
-      
+      console.log('sites ',this.sites); 
     },
     loadSitesDestination(){
       if(!php.empty(this.sites)){
@@ -1048,20 +1048,15 @@ export default {
         console.log('lettre de voiture ',this.lettrev);
           this.submitted = true 
           this.$operationParc.post('lettres-voiture', this.lettrev).then(response => {
-            let result = response.data.result.Items
-              if(result!=undefined){
-                this.submitted = false 
-                this.resetForm()
-                App.notifySuccess(response.data.message)
-                return this.$router.push({ name: "lettres-voiture" });
-              }else{
-                  //this.anomalies=response.data.result.annomalies.toString()
-                this.displayError(response.data.result.annomalies.toString())
-                return this.submitted=false;
-              }  
+            console.log('new response',response);
+            this.submitted = false 
+            this.resetForm()
+            App.notifySuccess(response.data.message)
+            return this.$router.push({ name: "lettres-voiture" });
           }).catch(error => {
               console.log('entrée dans le catch',error);
               this.submitted = false
+              this.displayError(error.response.data.result.toString())
              // this.errorHappened(error.response.data)
           })
     },
@@ -1110,7 +1105,8 @@ export default {
         let message=annomalies!=undefined?annomalies:'erreur interne du serveur'
         const ok = await this.$refs.errorscreationinfo.show({
               title: 'Information',
-              anomalies:message
+              anomalies:message,
+              filename:"annomalies_lv"
             })
             if (ok) {
                 this.$refs.errorscreationinfo._close();

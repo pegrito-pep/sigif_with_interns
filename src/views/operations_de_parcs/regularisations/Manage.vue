@@ -154,7 +154,8 @@
                     <b-img src="@/assets/images/iconSUBMIT_16x16.png"></b-img>
                     soumettre
                     </b-button>
-                  <b-button @click="imprimerEntreeRegularisation" :disabled="!canPrintRegularisation" size="sm" :class="{'change-image-opacity': !canPrintRegularisation,  'not-change-image-opacity': canPrintRegularisation}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>imprimer</b-button>
+                    <b-button @click.prevent="imprimerRegularisationPDF"  :disabled="!imprimerRegularisationPDF||wait" size="sm" :class="{'change-image-opacity': !imprimerRegularisationPDF,  'not-change-image-opacity': imprimerRegularisationPDF}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img><b-spinner v-if="wait" small></b-spinner><span v-else>imprimer</span> </b-button>
+                  <!--<b-button @click="imprimerEntreeRegularisation" :disabled="!canPrintRegularisation" size="sm" :class="{'change-image-opacity': !canPrintRegularisation,  'not-change-image-opacity': canPrintRegularisation}" class="mx-1 simple-btn"><b-img src="@/assets/images/iconIMPRIMER_16x16.png"></b-img>imprimer</b-button>-->
                   <b-dropdown toggle-class='customDropdown not-change-image-opacity' style="color:green;" variant='none' class="customDropdown m-md-2" id="dropdown-1" text="autre action">
                     <b-dropdown-item @click.prevent="showListingLotsRegularisation">Listing des lots de régularisation</b-dropdown-item>
                   </b-dropdown>  
@@ -312,7 +313,8 @@ export default {
     /**propriétées de gestion des boutons valider et soumettre*/
     idoperation:'',
     title:'',
-    action:''
+    action:'',
+    wait:false
   }),
   watch:{
     elements(value){
@@ -399,6 +401,57 @@ export default {
       this.searchentite = query
       this.offsetEntites = 0
     },
+    // impression unitaire régularisation
+    imprimerRegularisationPDF(){
+      if(this.selected[0].typeProduit==='Grumes'){
+        this.wait=true;
+        this.$jasper.post("ItextController/imprimerlotregularisation", {
+                        "idoperation":Number(this.selected[0].idoperation),
+                    },{responseType:'blob'})
+          .then((response) => { 
+            if(response.status===200) {
+                const blob = new Blob([response.data], {type: 'application/pdf'});
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `Regularisation_${this.selected[0].idoperation}.pdf`;
+                link.click();
+                URL.revokeObjectURL(link.href)
+                
+                this.wait=false; 
+            }else{
+                console.log(response)
+            }
+          })
+          .catch((error) => {
+              console.log(error);   
+              this.wait=false;
+          });
+        }
+        if(this.selected[0].typeProduit==='Débités'){
+          this.wait=true;
+          this.$jasper.post("ItextController/imprimerlotregularisation", {
+                "idoperation":Number(this.selected[0].idoperation),
+            },{responseType:'blob'})
+            .then((response) => { 
+              if(response.status===200) {
+                const blob = new Blob([response.data], {type: 'application/pdf'});
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `Regularisation_${this.selected[0].idoperation}.pdf`;
+                link.click();
+                URL.revokeObjectURL(link.href)
+                
+                this.wait=false; 
+              }else{
+                console.log(response)
+              }
+            })
+            .catch((error) => {
+                console.log('exécution bad 1');   
+                this.wait=false;
+            });
+        }
+    },
   //lising des lots de régularisation
   showListingLotsRegularisation(){
     this.$refs.opeparcDialogue.show({
@@ -407,13 +460,13 @@ export default {
     })
   },
   showDetails(){ this.$router.push({name: 'details-regularisations', params: { id: this.selected[0].idoperation }}); },
-  imprimerEntreeRegularisation(){
+  /*imprimerEntreeRegularisation(){
     this.$refs.listingEntreeReg.show({
       title:'Impression d\'une entrée régularisation',
         commande:6,
         idoperation:this.selected[0].idoperation
     })
-  },
+  },*/
   async getSites(){
       this.showOverlaySite=true
       if(!php.empty(this.$store.state.sitesnoutbs)){
@@ -446,7 +499,7 @@ export default {
       this.isRowselected = true;
       
       this.selected = items;
-      // console.log(items)
+      console.log(items)
 
       if(!php.empty(this.selected[0])){
       
@@ -464,7 +517,6 @@ export default {
         }
       }
   },
-  callEditOperationParc(){this.$bvModal.show('modal-lg')},
    getRequestParams(page, pageSize){
       let params= {
         page: 0,

@@ -1252,7 +1252,8 @@ export default {
         let message=annomalies!=undefined?annomalies:'erreur interne du serveur'
         const ok = await this.$refs.errorscreationinfo.show({
               title: 'Information',
-              anomalies:message
+              anomalies:message,
+              filename:'annomalies_billonnage_colis'
             })
             //If you throw an error, the method will terminate here unless you surround it wil try/catch
             if (ok) {

@@ -131,7 +131,7 @@
                             {{ status.libelle }}
                           </option>
                         </select>
-                      <div style="float:right; width: 250px !important" class="">
+                      <div style="float:right; width: 250px !important" class="mt-1">
                         <search-bar-actions-buttons @search="filterTable" @reset="reset"/>
                       </div>                                                                                 
                     </b-form-group>

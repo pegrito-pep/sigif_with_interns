@@ -1213,7 +1213,6 @@ export default {
                         // "idessence":1122
                     },{responseType:'blob'})
                     .then((response) => { 
-                        console.log('exécution ok 1',response.data); 
                         // console.log('Search',this.search)
                         if(response.status===200) {
                             // console.log('res data:',response.data)

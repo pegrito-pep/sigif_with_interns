@@ -9,7 +9,7 @@
                   </button><span class="ml-1 font-weight-bold">Consultation Entrée de parc n°{{ entreeParc.idoperation }}</span></h4>
                     
                   </b-col>
-                <b-col class="col-md-auto">
+                <b-col class="col-md-auto d-flex">
                   <span v-if="!isMinfof">
                     <span v-if="entreeParc.statut=='Brouillon'" class="d-flex justify-content-between">
                     <b-button v-if="isToValidate" @click.prevent="validerEntreeparc" size="sm"   class="mx-1 px-1 simple-btn" style="cursor: pointer"><b-img src="@/assets/images/picto_enregistrer_vert.png"></b-img>Valider</b-button>

@@ -78,8 +78,8 @@ if (token) {
     baseURL: url + '/tracalabilite'
   })
   const jasper = axios.create({
-    baseURL: url + '/JasperReport',
-    headers: {'Authorization': `Bearer ${token}`}
+    baseURL: url + '/JasperReport'
+    //headers: {'Authorization': `Bearer ${token}`}
   })
   
   Vue.prototype.$auth = authInstance
@@ -98,7 +98,7 @@ if (token) {
   Vue.prototype.$exportations = exportations
   Vue.prototype.$jasper = jasper
   Vue.prototype.$tracalabilite = tracalabilite
-  Vue.prototype.$JasperReport = 'http://192.168.10.109:8080/JasperReport'
+  Vue.prototype.$JasperReport = 'http://192.168.100.109:8080/JasperReport'
 
 
 const _api = {
@@ -561,7 +561,23 @@ tracalabilite.interceptors.response.use(
         return Promise.reject(error)
     }
 );
-
+//MODULE JASPERREPORT
+//interception module EXPORTATIONS
+jasper.interceptors.request.use(
+    function (config) {
+        // Do something before request is sent
+        const token = storage.get('access_token')
+        if (token != '' && token != null) {
+            config.headers['Authorization'] = `Bearer ${token}`
+            //config.headers['Access-Control-Allow-Origin'] = '*'
+        }
+        return config;
+    },
+    function (error) {
+        // Do something with request error
+        return Promise.reject(error);
+    }
+  );
 
 
 
@@ -613,6 +629,9 @@ _axios.interceptors.response.use(
         let data = response.data || null
         if (data == null) {
             return Promise.reject(response)
+        }
+        if(data.status==500){
+            return App.alertError('Erreur interne du Serveur')
         }
         if (data.code == 498) {
             storage.clear()

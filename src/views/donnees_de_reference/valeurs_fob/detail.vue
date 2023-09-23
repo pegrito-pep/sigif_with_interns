@@ -6,18 +6,11 @@
               <b-row>
                 <b-col><h4 class="tab-header-left-text">
                   <button id="toggleSideBar" @click="toggleSideBar"><span aria-hidden="true" style="font-size: 30px">&times;</span>
-                  </button><span class="ml-1 font-weight-bold">Consultation Entrée de parc n°{{ entreeParc.idoperation }}</span></h4>
+                  </button><span class="ml-1 font-weight-bold">Consultation Valeur FOB n° {{ valeurFob.idvaleurfob }}</span></h4>
                     
                   </b-col>
                 <b-col class="col-md-auto">
-                  <span v-if="!isMinfof">
-                    <span v-if="entreeParc.statut=='Brouillon'" class="d-flex justify-content-between">
-                    <b-button v-if="isToValidate" @click.prevent="validerEntreeparc" size="sm"   class="mx-1 px-1 simple-btn" style="cursor: pointer"><b-img src="@/assets/images/picto_enregistrer_vert.png"></b-img>Valider</b-button>
-                  </span>
-                  <span v-else-if="entreeParc.statut=='Validée'" class="d-flex justify-content-between">
-                    <a  @click.prevent="soumettreEntreeparc" size="sm"   class="mx-1 px-1 simple-btn" style="cursor: pointer"><b-img src="@/assets/images/picto_enregistrer_vert.png"></b-img>Soumettre</a>
-                  </span>
-                  </span>
+                  
                   <span>
                     <a @click.prevent="fermer" size="sm" class="mx-1 simple-btn" style="color:#82C138; cursor: pointer"><b-img src="@/assets/images/picto_retour_vert.png"></b-img>Fermer</a>
                   </span>
@@ -26,233 +19,90 @@
             </div>
       <b-card class="b-card">
         <b-row>
-          <b-col cols="3">
-            <P> site: <strong>{{ entreeParc.site }}</strong>
-             <b-badge pill variant="secondary">{{ entreeParc.libelletypesite }}</b-badge> 
+          <b-col cols="4">
+            <P> Arrete n°: <strong>{{ valeurFob.arreteFob }}</strong>
+             <!--<b-badge pill variant="secondary">PF</b-badge> -->
             </P>
           </b-col>
           <b-col cols="3">
-            <P> Date opération: <strong>{{entreeParc.dateoper}}</strong> </P>
+            <P> Date Signature: <strong>{{ $dayjs(valeurFob.datecrea).format("DD/MM/YYYY") }}</strong> </P>
           </b-col>
           <b-col cols="3">
-            <p> Heure: <strong>{{entreeParc.heureoper}}</strong> </p>
+            <p> Date effet <strong v-if="valeurFob.dateeffet!=null">{{ $dayjs(valeurFob.dateeffet).format("DD/MM/YYYY") }}</strong> </p>
           </b-col>
-          <b-col cols="3">
-            <p> Statut: 
-              <b-badge v-if="entreeParc.statut=='Brouillon'" pill variant="danger">{{ entreeParc.statut }}</b-badge>
-              <b-badge v-else-if="entreeParc.statut=='Validée'" pill variant="secondary">{{ entreeParc.statut }}</b-badge>
-              <b-badge v-else-if="entreeParc.statut=='Soumise'" pill variant="success">{{ entreeParc.statut }}</b-badge>
-            </p>
-          </b-col>
+
         </b-row>
         <b-row>
-          <b-col cols="3">
-            <P> Type de produits: 
-             <b-badge v-if="entreeParc.typeproduit=='GR'" pill variant="secondary">Grumes</b-badge> 
-             <b-badge v-if="entreeParc.typeproduit=='CL'" pill variant="secondary">Colis</b-badge> 
-            </P>
+          <b-col cols="3" v-if="valeurFob&&valeurFob.refarrete!=null">
+            <p> Fichier: 
+              <a class="mx-1 detail-permis-item" v-if="valeurFob&&valeurFob.refarrete!=null" v-b-tooltip.hover title="consulter le fichier" target="_blank" :href="valeurFob.refarrete"><b-img src="@/assets/images/Attach_128x128.png"></b-img>arreté FOB</a>
+            </p>
           </b-col>
         </b-row>
       </b-card>
 
     </div>
-      <!--entete des tableaux -->
+    <div>
       <div class="m-0 px-2 table-header-border">
-        <b-row>
-          <b-col class="d-flex"><h4 class="tab-header-left-text mb-0"> Liste des Produits </h4>
-            <h4>
-              <b-button @click.prevent="exportData" variant="none">
-                <b-spinner v-if="exporting" small class="mx-2"></b-spinner>
-                <span v-else>exporter les produits</span>
-              </b-button>
-            </h4>
-        </b-col>
-        <b-col class="d-flex">
-          <h3  class="mx-2"><b-badge variant>{{ entreeParc.pieceNombreTotal }}
-            <span v-if="entreeParc.typeproduit=='GR'">grume<span v-if="entreeParc.pieceNombreTotal>1">s</span></span>
-            <span v-if="entreeParc.typeproduit=='CL'">Débités</span>
-            </b-badge>
-          </h3> 
-          <h3  class="mx-2"><b-badge><b>{{ entreeParc.volumeTotal  }} m <sup>3</sup></b></b-badge></h3> 
-        </b-col>
-        </b-row>
-      </div>
-      <!--implémentation tableau proprement dite-->
-      <div class="ml-1" style="width:95%" >
-        <b-table v-if="entreeParc.typeproduit=='GR'" sticky-header="500px"  :busy="isBusy" hover select-mode="single" ref="selectableGrumes" responsive="sm" :items="itemsProduits"  :fields="fieldsGrumes" selectable :tbody-tr-class="rowClass" >
-            <template v-slot:head(validite)><span class="d-flex justify-content-around" style="color:green"><span class="mt-1 d-flex justify-content-between align-content-between">Validité</span><custom-select :setWidth="selectWidht" :options="options" :default="'valide'" class="select" /> </span></template>
-            <template v-slot:head(codebarre)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(sequence)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(numdf10)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(essence)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(dpb)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(dgb)="data"><span v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(longueur)="data"><span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span></template>
-            <template v-slot:head(volume)="data">
-              <span class="d-flex justify-content-center align-items-center">
-                <span v-html="data.field.label" style="color:green"></span><span style="color:green">(m<sup>3</sup>)</span>
-              </span>
-            </template>
-
-              <template #table-busy>
-                <div class="text-center text-success my-2">
-                  <b-spinner class="align-middle"></b-spinner>
-                  <strong class="ml-1">chargement...</strong>
-                </div>
-              </template>
-              <template #empty>
-                <h4 style="color:green" class="text-center">Aucune opération de parc de type <span class="font-weight-bold">Entrée parc</span> trouvée!!</h4>
-              </template>
-                <template #cell(index)="data"><b class="ml-1" style="color: #175131!important">{{ ++data.index }}</b> </template>
-                <template #cell(validite)>
-                  <span style="display: flex;justify-content: center;align-items: center;" ><b-form-checkbox  checked="true" disabled></b-form-checkbox></span>
-                </template> 
-                <template #cell(codebarre)="data">
-                  <input type="text" v-model="data.item.codebarre" class="form-control-xs m-1 w-75 font-weight-bold" :class="{'bgGreen': data.item.isEven,  'bgWhite': data.item.isOdd}" style="background:#82C138; border: 1px solid white;">
-                </template> 
-                <template #cell(sequence)="data">
-                  <input type="text" v-model="data.item.sequence" class="form-control-xs m-1 w-75" :class="{'bgGreen': data.item.isEven,  'bgWhite': data.item.isOdd}" style="border: 1px solid white;">
-                </template> 
-                <template #cell(numdf10)="data">
-                  <input type="text" v-model="data.item.numdf10" class="form-control-xs m-1 w-75" :class="{'bgGreen': data.item.isEven,  'bgWhite': data.item.isOdd}" style="border: 1px solid white;">
-                </template> 
-                <template #cell(essence)="data">
-                  <input type="text" v-model="data.item.essence" class="form-control-xs m-1 w-75" :class="{'bgGreen': data.item.isEven,  'bgWhite': data.item.isOdd}" style="border: 1px solid white;">
-                </template>
-                <template #cell(dpb)="data">
-                  <input type="text" v-model="data.item.dpb" class="form-control-xs m-1 w-75" :class="{'bgGreen': data.item.isEven,  'bgWhite': data.item.isOdd}" style="border: 1px solid white;">
-                </template>
-                <template #cell(dgb)="data">
-                  <input type="text" v-model="data.item.dgb" class="form-control-xs m-1 w-75" :class="{'bgGreen': data.item.isEven,  'bgWhite': data.item.isOdd}" style="border: 1px solid white;">
-                </template>
-                <template #cell(longueur)="data">
-                  <input type="text" v-model="data.item.longueur" class="form-control-xs m-1 w-75" :class="{'bgGreen': data.item.isEven,  'bgWhite': data.item.isOdd}" style="border: 1px solid white;">
-                </template>
-                <template #cell(volume)="data">
-                  <input type="text" v-model="data.item.volume" class="form-control-xs m-1 w-75" :class="{'bgGreen': data.item.isEven,  'bgWhite': data.item.isOdd}" style="border: 1px solid white;">
-                </template>   
-        </b-table>
-        <div v-else-if="entreeParc.typeproduit=='CL'">
-            <b-overlay class="m-2 px-2" rounded="sm" :show="showOverlayCodeData">
-              <div>
-                <b-table :items="itemsdebites"  :fields="fieldsDebites" class="mt-1" outlined   ref="selectableDebites" select-mode="single" selectable  :tbody-tr-class="rowClass" @row-selected="onRowSelectedDebites">
-                  <template v-slot:head(codebarre)="data">
-                    <span v-html="data.field.label" style="color:green"></span>
-                  </template>
-                  <template v-slot:head(sequence)="data">
-                    <span v-html="data.field.label" style="color:green"></span>
-                  </template>
-                  <template v-slot:head(numdf10)="data">
-                    <span v-html="data.field.label" style="color:green"></span>
-                  </template>
-                  <template v-slot:head(essence)="data">
-                    <span v-html="data.field.label" style="color:green"></span>
-                  </template>
-                  <template v-slot:head(longueur)="data">
-                    <span v-html="data.field.label" style="color:green"></span>
-                  </template>
-                  <template v-slot:head(largeur)="data">
-                    <span v-html="data.field.label" style="color:green"></span>
-                  </template>
-                  <template v-slot:head(epaisseur)="data">
-                    <span v-html="data.field.label" style="color:green"></span>
-                  </template>
-                  <template v-slot:head(nombrePieces)="data">
-                    <span v-html="data.field.label" style="color:green"></span>
-                  </template>
-                  <template v-slot:head(volume)="data">
-                    <span class="d-flex justify-content-center align-items-center">
-                      <span v-html="data.field.label" style="color:green"></span><span style="color:green">(m<sup>3</sup>)</span>
-                    </span>
-                  </template>
-             
-                  <template #cell(index)="data"><b class="ml-1" style="color: #175131!important">{{ ++data.index }}</b> </template>
-                  
-                  <template #cell(codebarre)="data">
-                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.codebarre" />
-                  </template>
-                  <template #cell(sequence)="data">
-                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.sequence" />
-                  </template>
-                  <template #cell(numdf10)="data">
-                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.numdf10" />
-                  </template>
-                  <template #cell(essence)="data">
-                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.essence" />
-                  </template>
-                  <template #cell(longueur)="data">
-                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.longueur" />
-                  </template>
-                  <template #cell(largeur)="data">
-                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.largeur" />
-                  </template>
-                  <template #cell(epaisseur)="data">
-                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.epaisseur" />
-                  </template>
-                  <template #cell(nombrePieces)="data">
-                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.nombrePieces" />
-                  </template>
-                  <template #cell(volume)="data">
-                    <input disabled size="xs" class="w-75 mx-1 px-1 sigif-input-view text-left"  style="color:white!important" v-model="data.item.volume" />
-                  </template>
-                
-                </b-table>
-                <div class="px-2 table-header-border mt-5">
-                  <b-row>
-                      <b-col cols="2"><h4 class="tab-header-left-text" style="font-size: 14px !important;">Détail des débités</h4></b-col>
-                  </b-row>
-                </div>
-                <b-table sticky-header="250px" :busy="isBusyDetailsDebites" hover select-mode="single" responsive="sm" :items="itemsDetailsDebites"  :fields="fieldsDetailsDebites" :tbody-tr-class="rowClass" ref="selectableTableDetailsDebites" selectable  show-empty>
-                  <template v-slot:head(codebarre)="data"><span v-html="data.field.label"  style="color:green; font-size:0.8rem"></span></template>
-                  <template v-slot:head(epaisseur)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
-                  <template v-slot:head(largeur)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
-                  <template v-slot:head(longueur)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
-                  <template v-slot:head(nombrepiece)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
-                  <template v-slot:head(poids)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
-                  <template v-slot:head(superficie)="data"><span v-html="data.field.label" style="color:green; font-size:0.8rem"></span></template>
-                  <template v-slot:head(volume)><span style="color:green; font-size:0.8rem">volumeu(m<sup>3</sup>)</span></template>
-         
-                    <template #table-busy>
-                      <div class="text-center text-success my-2">
-                        <b-spinner class="align-middle"></b-spinner>
-                        <strong class="ml-1">chargement...</strong>
-                      </div>
-                    </template>
-                      <template #empty>
-                        <h4 style="color:green" class="text-center">Aucun détail trouvé !!</h4>
-                      </template>
-                     
-                      <template #cell(index)="data"><b class="ml-1" style="color: #175131!important">{{ ++data.index }}</b> </template>
-                      <template #cell(codebarre)="data">
-                       <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white" placeholder="" v-model="data.item.codebarre" />
-                      </template> 
-                      <template #cell(epaisseur)="data">
-                       <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white; text-align:right" placeholder="" v-model="data.item.epaisseur" />
-                      </template> 
-                      <template #cell(largeur)="data">
-                       <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white; text-align:right" placeholder="" v-model="data.item.largeur" />
-                      </template>
-                      <template #cell(longueur)="data">
-                       <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white; text-align:right" placeholder="" v-model="data.item.longueur" />
-                      </template> 
-                      <template #cell(nombrepiece)="data">
-                       <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white; text-align:right" placeholder="" v-model="data.item.nombrepiece" />
-                      </template>
-                      <template #cell(poids)="data">
-                       <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white; text-align:right" placeholder="" v-model="data.item.poids" />
-                      </template>
-                      <template #cell(superficie)="data">
-                       <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white; text-align:right" placeholder="" v-model="data.item.superficie" />
-                      </template>
-                      <template #cell(volume)="data">
-                       <b-form-input disabled size="sm" class="w-75 py-0 px-2 m-0 change_bg" style="height: 20px !important; color:black; border: 1px solid white; text-align:right" placeholder="" v-model="data.item.volume" />
-                      </template>      
-               </b-table>
-              </div>
-            </b-overlay>
+          <b-row>
+            <b-col><h4 class="tab-header-left-text"> Liste des valeurs FOB</h4></b-col>
+          
+          </b-row>
         </div>
-      </div>
+        <!--implémentation tableau proprement dite-->
+        <div class="ml-1">
+            <b-table  :busy="isBusy" hover  select-mode="single" responsive="sm" ref="tableDetailsValeursFob" selectable @row-selected="onRowSelected"
+              :items="itemsVFob" 
+              :fields="fieldsVFob" 
+              :tbody-tr-class="rowClass" show-empty>
+                <template #table-busy>
+                  <div class="text-center text-success my-2">
+                    <b-spinner class="align-middle"></b-spinner>
+                    <strong class="ml-1">chargement...</strong>
+                  </div>
+                </template>
+                <template v-slot:head(essence)="data">
+                  <span  v-html="data.field.label" style="color:green"></span>
+                </template>
+                <template v-slot:head(zone1)="data">
+                  <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
+                </template>
+                <template v-slot:head(zone2)="data">
+                  <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
+                </template>
+                <template v-slot:head(zone3)="data">
+                  <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
+                </template>
+                <template v-slot:head(zone4)="data">
+                  <span class="d-flex justify-content-center align-items-center" v-html="data.field.label" style="color:green"></span>
+                </template>
+                <template #empty>
+                  <h4 style="color: green" class="text-center">
+                    Aucune
+                    <span class="font-weight-bold">donnée</span> trouvée!!
+                  </h4>
+                </template>
+                <template #cell(essence)="data">
+                    <input type="text" disabled v-model="data.item.essence" class="form-control-xs m-1" style="background:#fff; border: 1px solid white;color: black;width:98%;">
+                </template> 
+                <template #cell(zone1)="data">
+                  <input type="text" v-model="data.item.zone1" class="form-control-xs m-1 w-75 font-weight-bold" style="background:#fff; border: 1px solid white;color: black;width:98%;">
+                </template>
+                <template #cell(zone2)="data">
+                  <input type="text" v-model="data.item.zone2" class="form-control-xs m-1 w-75 font-weight-bold" style="background:#fff; border: 1px solid white;color: black;width:98%;">
+                </template>
+                <template #cell(zone3)="data">
+                  <input type="text" v-model="data.item.zone3" class="form-control-xs m-1 w-75 font-weight-bold" style="background:#fff; border: 1px solid white;color: black;width:98%;">
+                </template>
+                <template #cell(zone4)="data">
+                  <input type="text" v-model="data.item.zone4" class="form-control-xs m-1 w-75 font-weight-bold" style="background:#fff; border: 1px solid white;color: black;width:98%;">
+                </template>  
+            </b-table>
 
+            <!--AJOUT DE LA PAGINATION -->
+            <paginator hr="top" :offset="offset" :total="total" :limit="perPage" :page="currentPage" @pageChanged="changePage" @limitChanged="(limit) => {perPage = limit}"/>  
+        </div>
+    </div>  
     </b-overlay>
   </div>
 
@@ -265,28 +115,51 @@
 export default {
   name: "details_valeurs_fob",
   data: () => ({
-
+    fieldsVFob:[
+      { key: 'index', label: '' },
+      { key: 'essence', label: 'Essence',thStyle:"width:50%" },
+      { key: 'zone1', label: 'Zone 1' },
+      { key: 'zone2', label: 'Zone 2' },
+      { key: 'zone3', label: 'Zone 3' },
+      { key: 'zone4', label: 'Zone 4' }
+    ],
+    elementsVFob:[
+      {essence:"Oboto", zone1:48640, zone2:46230, zone3:44005, zone4:1},
+      {essence:"Odou Sika", zone1:47600, zone2:45230, zone3:43100, zone4:1},
+      {essence:"Okan", zone1:85235, zone2:81175, zone3:77115, zone4:1}
+    ],
+    offset: 0,
+    perPage: 10,
+    total: 3,
+    currentPage: 1,
     isBusy:false,
     isRowselected:false,
     valeurFob:{},
-     elementsdetailsdebites:[],
   }),
   components:{
-    TabHead,
-    ErrorDialogue,
-    OperationParcBox,
-    InfosBox
   },
   watch:{
-
-
+    elementsVFob(value){
+      if(!php.empty(value)){
+        setTimeout(() => {this.$refs['tableDetailsValeursFob'].selectRow(0) }, 200);
+      }
+    },
   },
   computed:{
-    ...mapGetters(['user','hasAccess']),   
+    ...mapGetters(['user','hasAccess']),
+    itemsVFob(){
+      return this.elementsVFob.map((a, index) => {  
+        a.isFirst = index == 0        
+        a.isEven = index %2 == 0        
+        return a
+      })
+    }  
   },
  
  methods: {
-
+  onRowSelected(items) {
+    console.log('items ',items);
+  },
   async displayError(error){
     this.$refs.opeparcDialogue._close();
       const ok = await this.$refs.errorDialogue.show({
@@ -325,19 +198,20 @@ export default {
       this.currentPage,
       this.pageSize
     );
-    await this.$donneesReference.get('valeurs-fob/' +this.$route.params.id, {params}).then(response =>{
+    await this.$donneesReference.get('valeurs-fob/' +this.$route.params.id).then(response =>{
       console.log('response',response);
       this.valeurFob= response.data.result
-      this.total=response.data.result.totalItems
-      this.currentPage=response.data.result.currentPage +1
+      this.showOverlay = false
+
+     /* this.total=response.data.result.totalItems
+      this.currentPage=response.data.result.currentPage +1*/
     } )
 
     
-    this.showOverlay = false
   },
 
 
-    fermer() {this.$router.push({name: "entree_parcs"});},
+    fermer() {this.$router.back();},
 
     toggleSideBar() {
         var sidebar = document.querySelector("#sidebar");
@@ -404,6 +278,13 @@ export default {
 
 </script>
 <style scoped>
+.detail-permis-item {
+  color: #175131!important;
+}
+
+.detail-permis-item:hover{
+  text-decoration: underline;
+}
 .simple-btn{
   color: rgb(130, 193, 56)!important;
 }

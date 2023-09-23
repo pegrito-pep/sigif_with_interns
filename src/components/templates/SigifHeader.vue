@@ -12,7 +12,7 @@
             <b-navbar-brand title="page de profil" v-if="user!=null&&user.profil!=null"  class="toUnderline old-system-props">
               <a @click.prevent="gotoprofil"><b-img class="navbar-icon-user" src="@/assets/images/picto_user_blanc.png"></b-img>  </a>  
               <a  @click.prevent="showChangePasswordForm" class="text-white" style="white-space: nowrap; padding-left: 8px;"><span class="text-uppercase">{{ user.nom }} </span><span class="text-capitalize">{{ user.prenom}} <span style="font-size: 10px!mportant">|</span> </span>
-                {{ $t('data.role') }} :<span class="text-uppercase">{{ user ? user.profil.organisation : null }}, {{ user.profil.institule }}</span>
+                {{ $t('data.role') }} :<span class="text-uppercase">{{ user.profil.intitule }}, {{ user ? user.profil.organisation : null }}</span>
               </a>
             </b-navbar-brand>
             <div class="icons">

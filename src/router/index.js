@@ -503,6 +503,13 @@ const routes = [
             import ('../views/donnees_de_reference/valeurs_fob/Manage.vue')
     },
     {
+        path: '/donnees-reference-valeurs_fob/:id',
+        name: 'details_valeurs_fob',
+        meta: { layout: 'default'},
+        component: () =>
+            import ('../views/donnees_de_reference/valeurs_fob/detail.vue')
+    },
+    {
         path: '/donnees-reference-classe_de_qualite',
         name: 'classe_de_qualite',
         meta: { layout: 'default'},

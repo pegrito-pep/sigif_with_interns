@@ -36,49 +36,87 @@
             </b-overlay>
           </div>
         </div>
-        <b-row class="m-2">
-            <div class="col-lg-6 col-6">
-              <!-- small box -->
-              <div class="small-box bg-success">
-                <div class="inner">
-               
-                  <b-carousel
-                    id="carousel-1"
-                    :interval="4000"
-                    :controls="onlinesUsers.length>1"
-                    :indicators="onlinesUsers.length>1"
-                    background="#ababab"
-                    img-width="1024"
-                    img-height="480"
-                    style="text-shadow: 1px 1px 2px #333;"
-                  
-                  >
-                    <!-- Slides with image only -->
-                    <b-carousel-slide  v-for="user in onlinesUsers" :key="user.login">
-                      <template #img>
-                        <div style="width:100%; height:100%;">
-                          <a href="#" class="list-group-item list-group-item-action border-0" style="background-color: lightgrey;">
-                            <div class="d-flex align-items-start">
-                              <img src="@/assets/images/picto_user_blanc.png" class="rounded-circle mr-1" alt="Vanessa Tucker" width="200" height="200">
-                              <div class="flex-grow-2 ml-3">
-                                <span style="font-size: 3rem;">{{ user.nom }} {{ user.prenom }}</span>
-                                
-                                <div class="small text-center"><span style="font-size: 2rem; font-style: italic;color: green">{{ user.profil.intitule }}</span> </div>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </template>
-                    </b-carousel-slide>
-                  </b-carousel>
-                </div>
-                <div  class="icon">
-                  <i class="fa fa-circle" style="color: green;"></i>
-                </div>
-                <a href="#" class="small-box-footer" style="font-size: 2rem">Liste des utilisateurs connectés</a>
+        <b-overlay :show="totalUtilisateurs == null" rounded="sm">
+        <div v-if="totalUtilisateurs != null">
+          <h4 class="mx-2">Liste des utilisateurs connectés</h4>
+          <b-row  class="m-2">
+              <div class="col-lg-6 col-6">
+                <b-table v-if="isMinfof"
+                  select-mode="single"
+                  responsive="sm"
+                  ref="selectableTable"
+                  sticky-header
+                  head-variant="light"
+                  :items="userConnected"
+                  :fields="fieldsMinfof"
+                  show-empty>
+                    <template #empty>
+                        <h4 style="color:green" class="text-center">Aucun<span class="font-weight-bold">utilisateur</span> trouvé!!</h4>
+                    </template>
+                    <template #table-busy>
+                      <div class="text-center text-success my-2">
+                        <b-spinner class="align-middle"></b-spinner>
+                        <strong class="ml-1">{{ $t("data.Chargement") }}</strong>
+                      </div>
+                    </template>
+                    <template #cell(index)="data"
+                      ><b class="ml-1" style="color: #175131 !important">{{
+                        ++data.index
+                      }}</b>
+                    </template>
+                    <template #cell(nomcomplet)="data">
+                      <span style="font-size: .7rem;">{{ data.item.nomcomplet }}</span>
+                    </template>
+                    <template #cell(profil)="data">
+                      <span style="font-size: .7rem;">{{ data.item.profil }}</span>
+                    </template>
+                    <template #cell(organisation)="data">
+                      <span style="font-size: .7rem;">{{ data.item.organisation }}</span>
+                    </template>
+                    <template #cell(statut)>
+                      <b-button small variant="success" class="rounded"></b-button>
+                    </template>
+                </b-table>
+                <b-table v-else
+                  select-mode="single"
+                  responsive="sm"
+                  ref="selectableTable"
+                  sticky-header
+                  head-variant="light"
+                  :items="userConnected"
+                  :fields="fields"
+                  show-empty>
+                    <template #empty>
+                        <h4 style="color:green" class="text-center">Aucun<span class="font-weight-bold">utilisateur</span> trouvé!!</h4>
+                    </template>
+                    <template #table-busy>
+                      <div class="text-center text-success my-2">
+                        <b-spinner class="align-middle"></b-spinner>
+                        <strong class="ml-1">{{ $t("data.Chargement") }}</strong>
+                      </div>
+                    </template>
+                    <template #cell(index)="data"
+                      ><b class="ml-1" style="color: #175131 !important">{{
+                        ++data.index
+                      }}</b>
+                    </template>
+                    <template #cell(nomcomplet)="data">
+                      <span style="font-size: .7rem;">{{ data.item.nomcomplet }}</span>
+                    </template>
+                    <template #cell(profil)="data">
+                      <span style="font-size: .7rem;">{{ data.item.profil }}</span>
+                    </template>
+                    <template #cell(statut)>
+                      <b-button small variant="success" class="rounded"></b-button>
+                    </template>
+                </b-table>
               </div>
-            </div>
-        </b-row>
+          </b-row>
+        </div>
+          
+
+          </b-overlay>
+          
     </div>
 </template>
 
@@ -97,10 +135,29 @@ export default {
   data: () => ({
     totalUtilisateurs:null,
     totalProfils:null,
-    onlinesUsers:[]
+    onlinesUsers:[],
+    fields:[
+      { nomcomplet: "compte", label: "Nom" },
+      { profil: "compte", label: "Profil" },
+      { statut: "compte", label: "statut" },
+    ],
+    fieldsMinfof:[
+      { nomcomplet: "compte", label: "Nom" },
+      { profil: "compte", label: "Profil" },
+      { statut: "compte", label: "statut" },
+      { key: "organisation", label: "organisation" },
+    ],
+    userConnected:[]
   }),
   computed:{
     ...mapGetters(['user','hasAccess']),
+    isMinfof(){ 
+      if(this.user.idOrganisation==0||this.user.typeOrganisation=='MF'){
+        return true;
+      }else{
+        return false;
+      }
+    },
   },
  
  methods: {
@@ -112,13 +169,21 @@ export default {
           this.totalUtilisateurs = response.data.result.registers;
           this.totalProfils = response.data.result.profils;
           this.onlinesUsers = response.data.result.utilisateurs;
+          for(let i =0; i<this.onlinesUsers.length;i++){
+            let u ={
+              nomcomplet: this.onlinesUsers[i].nom + ' '+this.onlinesUsers[i].prenom,
+              profil: this.onlinesUsers[i].profil.intitule,
+              statut: this.onlinesUsers[i].statut,
+              organisation:this.onlinesUsers[i].libelletypeOrganisation
+            }
+            this.userConnected.push(u)
+          }
           if(php.empty(this.onlinesUsers)){
-            this.onlinesUsers.push(this.user)
+            //this.onlinesUsers.push(this.user)
           }
         })
         .catch((error) => {
           console.log('error ',error);
-          this.isBusy = false;
           if(error.response.data.status==500){
             return App.alertError('Erreur interne du Serveur')
           }

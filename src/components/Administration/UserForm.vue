@@ -72,6 +72,7 @@
                     <b-form-group class="pl-1 mt-1"><b-form-checkbox :disabled="submitted" v-model="isActive" @change="setUserStatut">{{ isActive ?  'automatiquement activer cet utilisateur'  : 'ne pas activer l\'utilisateur'}}</b-form-checkbox></b-form-group>   
                 </b-row>
                 <hr>
+                <b-button class="float-left mt-2" @click.prevent="closeModal">Fermer</b-button>
                 <b-button type="submit" class="float-right mt-2" style="background: rgb(0, 82, 44) !important; " :disabled="submitted" @click.prevent="addUser" >Enregistrer <b-spinner v-if="submitted" small></b-spinner></b-button>
             </b-form>
             <serveur-error-box ref="errorDialogue"></serveur-error-box>
@@ -148,6 +149,9 @@ export default {
         
     }),
     methods: {
+        closeModal(){
+            this.$emit('closeUserModal');
+        },
         async getEntites(){
             this.showOverlay = true;
             if (!php.empty(this.$store.state.entiteswithoutminfof)) {

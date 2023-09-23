@@ -467,9 +467,7 @@ export default {
     },
   },
   mounted(){
-    this.unreachableapi();
    this.alertDisconnect()
-
   }
 }
 

@@ -103,7 +103,7 @@
                     </div>
                   </template>
                   <template v-slot:head(arreteFob)="data">
-                      <span v-html="data.field.label" class="d-flex justify-content-center align-items-center"></span>
+                      <span v-html="data.field.label"></span>
                     </template>
                   <template #empty>
                     <h4 style="color: green" class="text-center">
@@ -112,13 +112,13 @@
                     </h4>
                   </template>
                   <template #cell(arreteFob)="data">
-                        <span class="d-flex justify-content-center align-items-center"><b class="ml-1">{{ data.item.arreteFob }}</b> </span>
+                        <span><b class="ml-1">{{ data.item.arreteFob }}</b> </span>
                   </template>
                 
               </b-table>
 
               <!--AJOUT DE LA PAGINATION -->
-              <paginator hr="top" :offset="offset" :total="total" :limit="perPage" :page="currentPage" @pageChanged="changePage" @limitChanged="(limit) => {perPage = limit}" />  
+              <paginator hr="top" :offset="offset" :total="total" :limit="perPage" :page="currentPage" @pageChanged="changePage" @limitChanged="(limit) => {perPage = limit}"/>  
           </div>
             <!--AJOUT D'UN ARRETE FOB -->
           <b-modal id="modal-sm"  size="sm"  ref="valeurfob-form" hide-footer 
@@ -182,7 +182,7 @@ export default {
     //données du tableaux
     fields: [
         { key: 'index', label: '' },
-        { key: 'arreteFob', label: 'Arrêté no' },
+        { key: 'arreteFob', label: 'Arrêté N°',thStyle:"width:70%" },
         { key: 'dateSignature', label: 'Date signature' },
         { key: 'dateEffet', label: 'Date effet' },
     ],
@@ -219,7 +219,7 @@ export default {
     showDetails(){
       this.$router.push({
         name: "details_valeurs_fob",
-        params: { id: this.selected[0].arreteFob },
+        params: { id: this.selected[0].idvaleurfob },
       });
     },
    addValeurFob(){

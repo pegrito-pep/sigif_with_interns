@@ -8,7 +8,7 @@
         </div>
             <div  class="m-2 px-2">
                 <b-row>
-                    <b-form-textarea style="font-size:0.7rem"
+                    <b-form-textarea style="font-size:0.9rem"
                         id="textarea"
                         v-model="anomalies"
                         rows="3"
@@ -34,6 +34,7 @@ export default {
         // Parameters that change depending on the type of dialogue
         title: undefined,
         anomalies: undefined, // Main text content
+        filename:undefined,
         okButton: undefined, // Text for confirm button; leave it empty because we don't know what we're using it for
         cancelButton: 'Fermer', // text for cancel button
         // Private variables
@@ -54,7 +55,7 @@ export default {
             var content = this.anomalies;
 
             //create a file and put the content, name and type
-            var file = new File(["\ufeff"+content], 'anomalies_billonnages_colis.txt', {type: "text/plain:charset=UTF-8"});
+            var file = new File(["\ufeff"+content], `${this.filename}.txt`, {type: "text/plain:charset=UTF-8"});
 
             //create a ObjectURL in order to download the created file
             let url = window.URL.createObjectURL(file);
@@ -71,6 +72,7 @@ export default {
             this.title = opts.title
             this.message = opts.message
             this.anomalies = opts.anomalies
+            this.filename = opts.filename
             this.okButton = opts.okButton
             if (opts.cancelButton) {
                 this.cancelButton = opts.cancelButton
@@ -97,6 +99,7 @@ export default {
             this.title='',
             this.message='',
             this.okButton= '',
+            this.filename='',
             this.cancelButton= 'Fermer',
             this.file= null, 
             this.content= [], 

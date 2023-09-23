@@ -51,7 +51,7 @@ export default new Vuex.Store({
         },
         
         permissions(state) {
-            return state.user.profil.privileges.Items || [];
+          return state.user.profil.privileges.Items||[];
         },
         isSuperAdmin(state) {
             const privileges=(state.user.profil || [])
@@ -220,6 +220,10 @@ export default new Vuex.Store({
         },
         user(context, user) {
             context.commit('user', user)
+            context.commit('permissions', user.profil.privileges.Items)
+        },
+        permissions(context, permissions) {
+            context.commit('permissions', permissions)
         },
         typesProfils(context, typesProfils){
             context.commit('typesProfils',typesProfils)
@@ -251,9 +255,6 @@ export default new Vuex.Store({
                     storage.set('user', response.result)
                     commit('user', response.result)
             })
-        },
-        permissions(context, permissions) {
-            context.commit('permissions', permissions)
         },
         typesTitres(context, typestitres) {
             context.commit('typesTitres', typestitres)
